@@ -30,6 +30,15 @@ jobs:
         STORE_PASSWORD: defaultpass
         KEY_PASSWORD: defaultpass
 
+    - name: Restore Debug Keystore
+      run: |
+        if [ -f "debug.keystore.base64" ]; then
+          base64 -d debug.keystore.base64 > debug.keystore
+        else
+          echo "debug.keystore.base64 not found, generating a dummy debug.keystore..."
+          keytool -genkeypair -v -keystore debug.keystore -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -storepass android -keypass android -dname "CN=Android Debug, O=Android, C=US"
+        fi
+
     - name: Build Debug APK
       run: ./gradlew assembleDebug
 
