@@ -156,12 +156,43 @@ fun YoutubeWebViewPlayer(
         }
     }
 
+    LaunchedEffect(videoId) {
+        val html = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                <style>
+                    body, html {
+                        margin: 0;
+                        padding: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: #000000;
+                        overflow: hidden;
+                    }
+                    iframe {
+                        width: 100%;
+                        height: 100%;
+                        border: none;
+                    }
+                </style>
+            </head>
+            <body>
+                <iframe 
+                    src="https://www.youtube.com/embed/$videoId?autoplay=1&playsinline=1&controls=1&rel=0&enablejsapi=1" 
+                    allow="autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </body>
+            </html>
+        """.trimIndent()
+        
+        webView.loadDataWithBaseURL("https://www.youtube.com", html, "text/html", "UTF-8", null)
+    }
+
     AndroidView(
         factory = { webView },
-        update = { view ->
-            val embedUrl = "https://www.youtube.com/embed/$videoId?autoplay=1&playsinline=1&controls=1&rel=0"
-            view.loadUrl(embedUrl)
-        },
         modifier = modifier.background(Color.Black)
     )
 }
