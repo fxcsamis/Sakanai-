@@ -132,7 +132,7 @@ fun YoutubeWebViewPlayer(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val webView = remember(videoId) {
+    val webView = remember {
         android.webkit.WebView(context).apply {
             settings.javaScriptEnabled = true
             settings.mediaPlaybackRequiresUserGesture = false
@@ -142,48 +142,10 @@ fun YoutubeWebViewPlayer(
             settings.loadWithOverviewMode = true
             settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             
-            // Set robust desktop user agent to bypass any mobile webview restriction or play blockades
-            settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-            
-            // Set solid black background to ensure correct video frame compositing and prevent black screen rendering issues
-            setBackgroundColor(android.graphics.Color.BLACK)
-            
             webViewClient = android.webkit.WebViewClient()
             webChromeClient = android.webkit.WebChromeClient()
             
-            // Generate robust and responsive direct iframe embed code (no complex script API dependencies)
-            val html = """
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-                    <style>
-                        body, html {
-                            margin: 0;
-                            padding: 0;
-                            width: 100%;
-                            height: 100%;
-                            background-color: #000000;
-                            overflow: hidden;
-                        }
-                        iframe {
-                            width: 100%;
-                            height: 100%;
-                            border: none;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <iframe 
-                        src="https://www.youtube.com/embed/$videoId?autoplay=1&playsinline=1&controls=1&rel=0&enablejsapi=1" 
-                        allow="autoplay; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                </body>
-                </html>
-            """.trimIndent()
-            
-            loadDataWithBaseURL("https://www.youtube.com", html, "text/html", "UTF-8", null)
+            setBackgroundColor(android.graphics.Color.BLACK)
         }
     }
 
@@ -196,6 +158,10 @@ fun YoutubeWebViewPlayer(
 
     AndroidView(
         factory = { webView },
+        update = { view ->
+            val embedUrl = "https://www.youtube.com/embed/$videoId?autoplay=1&playsinline=1&controls=1&rel=0"
+            view.loadUrl(embedUrl)
+        },
         modifier = modifier.background(Color.Black)
     )
 }
