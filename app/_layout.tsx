@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AppThemeProvider from '@/components/context/apptheme';
 import MusicContextProvider from '@/components/context/music';
 import RefreshProvider from '@/components/context/refresh';
+import ThemePreferenceProvider from '@/components/context/themePreference';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import '@/global.css';
 import { useSetupPlayer } from '@/hooks/useSetupPlayer';
@@ -38,22 +39,26 @@ export default function Layout() {
 
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <SQLiteProvider databaseName='arise_raj_sqlite.db' onInit={InitiateDataBase}>
-            <AppThemeProvider colorTheme={colorScheme}>
-              <MusicContextProvider>
-                <RefreshProvider>
-                  <GluestackUIProvider mode={colorScheme ?? "light"} style={{ flex: 1 }}>
-                    <Stack screenOptions={{ headerShown: false }} >
-                      <Stack.Screen name='index' />
-                      <Stack.Screen name='(tabs)' />
-                    </Stack>
-                  </GluestackUIProvider>
-                </RefreshProvider>
-              </MusicContextProvider>
-            </AppThemeProvider>
-          </SQLiteProvider>
-        </ThemeProvider>
+        <ThemePreferenceProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <SQLiteProvider databaseName='arise_raj_sqlite.db' onInit={InitiateDataBase}>
+              <AppThemeProvider colorTheme={colorScheme}>
+                <MusicContextProvider>
+                  <RefreshProvider>
+                    <GluestackUIProvider mode={colorScheme ?? "light"} style={{ flex: 1 }}>
+                      <Stack screenOptions={{ headerShown: false }} >
+                        <Stack.Screen name='index' />
+                        <Stack.Screen name='(tabs)' />
+                        <Stack.Screen name='video/[id]' options={{ animation: 'slide_from_bottom' }} />
+                        <Stack.Screen name='video-search' options={{ animation: 'slide_from_right' }} />
+                      </Stack>
+                    </GluestackUIProvider>
+                  </RefreshProvider>
+                </MusicContextProvider>
+              </AppThemeProvider>
+            </SQLiteProvider>
+          </ThemeProvider>
+        </ThemePreferenceProvider>
       </Provider>
     </GestureHandlerRootView>
   );

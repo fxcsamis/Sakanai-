@@ -9,15 +9,17 @@ import { defaultAvtar } from '@/utils/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { Camera, Shield, Star, User, Webhook } from 'lucide-react-native';
+import { Camera, Moon, Shield, Smartphone, Star, Sun, User, Webhook } from 'lucide-react-native';
 import React from 'react';
-import { Image, Switch, Text, TextInput, TouchableOpacity, View, useColorScheme } from 'react-native';
+import { Image, Pressable, Switch, Text, TextInput, TouchableOpacity, View, useColorScheme } from 'react-native';
+import { useThemePreference } from '../context/themePreference';
 import Matrics from './Matrics';
 
 export default function Settings({ onTerm }: { onTerm: () => void }) {
     const router = useRouter();
     const { toggleWaveProgress, waveProgress } = useMusic();
     const { name: _name, avatar: _avtar } = useAppSelector(state => state.userReducer);
+    const { preference, setPreference } = useThemePreference();
     const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
 
@@ -142,6 +144,35 @@ export default function Settings({ onTerm }: { onTerm: () => void }) {
                 />
             </View>
 
+            <Text className="text-sm font-bold text-slate-400 dark:text-[#A1A1AA] uppercase tracking-wider ml-2 mb-2">
+                Appearance
+            </Text>
+            <View className="bg-white dark:bg-[#181818] rounded-xl shadow-sm dark:shadow-none border border-slate-100 dark:border-transparent mb-6 p-3">
+                <View className="flex-row bg-slate-50 dark:bg-[#242424] rounded-lg p-1 gap-1">
+                    <ThemeOption
+                        label="System"
+                        icon={<Smartphone size={16} color={preference === 'system' ? (isDark ? '#121212' : '#FFFFFF') : (isDark ? '#B3B3B3' : '#64748b')} />}
+                        active={preference === 'system'}
+                        isDark={isDark}
+                        onPress={() => setPreference('system')}
+                    />
+                    <ThemeOption
+                        label="Light"
+                        icon={<Sun size={16} color={preference === 'light' ? (isDark ? '#121212' : '#FFFFFF') : (isDark ? '#B3B3B3' : '#64748b')} />}
+                        active={preference === 'light'}
+                        isDark={isDark}
+                        onPress={() => setPreference('light')}
+                    />
+                    <ThemeOption
+                        label="Dark"
+                        icon={<Moon size={16} color={preference === 'dark' ? (isDark ? '#121212' : '#FFFFFF') : (isDark ? '#B3B3B3' : '#64748b')} />}
+                        active={preference === 'dark'}
+                        isDark={isDark}
+                        onPress={() => setPreference('dark')}
+                    />
+                </View>
+            </View>
+
             <Matrics />
 
             <Text className="text-sm font-bold text-slate-400 dark:text-[#A1A1AA] uppercase tracking-wider ml-2 mb-2">
@@ -188,5 +219,19 @@ function SettingRow({ icon, title, titleColor = "text-slate-700 dark:text-white"
             </View>
             {rightElement && rightElement}
         </Component>
+    );
+}
+
+function ThemeOption({ label, icon, active, isDark, onPress }: { label: string; icon: React.ReactNode; active: boolean; isDark: boolean; onPress: () => void }) {
+    return (
+        <Pressable
+            onPress={onPress}
+            className={`flex-1 flex-row items-center justify-center gap-1.5 py-2.5 rounded-md ${active ? (isDark ? 'bg-white' : 'bg-slate-900') : ''}`}
+        >
+            {icon}
+            <Text className={`text-[13px] font-semibold ${active ? (isDark ? 'text-[#121212]' : 'text-white') : (isDark ? 'text-[#B3B3B3]' : 'text-slate-500')}`}>
+                {label}
+            </Text>
+        </Pressable>
     );
 }

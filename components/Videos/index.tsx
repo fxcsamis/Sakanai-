@@ -12,18 +12,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import FocusAwareStatusBar from '../common/FocusAwareStatusBar';
 import { DemoVideo, demoVideos } from './demoVideos';
 import VideoCard from './VideoCard';
-import VideoPlayerModal from './VideoPlayerModal';
 
 export default function VideosScreen() {
     const router = useRouter();
     const { theme } = useAppTheme();
     const { colorScheme } = useColorScheme();
     const isDark = (colorScheme === 'dark' ? colorScheme : theme) === AppTheme.dark;
-    const [activeVideo, setActiveVideo] = React.useState<DemoVideo | null>(null);
 
-    const handleSearch = () => router.push('/(tabs)/search');
+    const handleSearch = () => router.push('/video-search');
 
     const handleDownload = () => Alert.alert('Download', 'Downloads will be available soon.');
+
+    const handleOpenVideo = (video: DemoVideo) => router.push(`/video/${video.id}`);
 
     return (
         <View className="flex-1 bg-white dark:bg-[#121212]">
@@ -58,13 +58,10 @@ export default function VideosScreen() {
             <FlatList
                 data={demoVideos}
                 keyExtractor={(item) => item.id}
-                numColumns={2}
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 14, paddingTop: 4, paddingBottom: 90 }}
-                renderItem={({ item }) => <VideoCard video={item} onPress={setActiveVideo} />}
+                contentContainerStyle={{ paddingTop: 4, paddingBottom: 90 }}
+                renderItem={({ item }) => <VideoCard video={item} onPress={handleOpenVideo} />}
             />
-
-            <VideoPlayerModal video={activeVideo} onClose={() => setActiveVideo(null)} />
         </View>
     );
 }
