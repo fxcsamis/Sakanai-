@@ -3,7 +3,7 @@
 
 import { useColorScheme } from 'nativewind';
 import React from 'react';
-import { Alert, Dimensions, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Pressable, ScrollView, Share, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
     Extrapolation,
@@ -13,7 +13,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import YoutubePlayer from 'react-native-youtube-iframe';
+import { VideoView, useVideoPlayer as useExpoVideoPlayer } from 'expo-video';
 import {
     ChevronDown,
     Download,
@@ -41,14 +41,51 @@ export default function VideoPlayerOverlay() {
     const isDark = colorScheme === 'dark';
     const insets = useSafeAreaInsets();
 
-    const MINI_MARGIN_TOP = insets.top + 66;
+    const MINI_MARGIN_BOTTOM = insets.bottom + 78;
+    const baseLeftMini = SCREEN_W - MINI_WIDTH - MINI_MARGIN_RIGHT;
+    const baseTopMini = SCREEN_H - MINI_HEIGHT - MINI_MARGIN_BOTTOM;
 
     const progress = useSharedValue(0);
+    // Free-drag offset for the mini PiP window, relative to its default docked corner.
+    const miniTranslateX = useSharedValue(0);
+    const miniTranslateY = useSharedValue(0);
+    const dragStartX = useSharedValue(0);
+    const dragStartY = useSharedValue(0);
+
+    // Native, direct-file player — no WebView, no YouTube embed, so nothing to
+    // break or get bot-checked. Source is swapped manually so switching videos
+    // (via "Up next") never remounts the player.
+    const player = useExpoVideoPlayer(activeVideo?.videoUrl ?? null, (p) => {
+        p.loop = true;
+    });
+
+    const [isReady, setIsReady] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!activeVideo) return;
+        setIsReady(false);
+        player.replace(activeVideo.videoUrl);
+        player.play();
+    }, [activeVideo?.id]);
+
+    React.useEffect(() => {
+        const sub = player.addListener('statusChange', (payload: { status: string }) => {
+            if (payload.status === 'readyToPlay') setIsReady(true);
+        });
+        return () => sub.remove();
+    }, [player]);
 
     React.useEffect(() => {
         if (!activeVideo) return;
         progress.value = withTiming(minimized ? 1 : 0, { duration: 260 });
     }, [minimized, activeVideo]);
+
+    React.useEffect(() => {
+        if (!minimized) {
+            miniTranslateX.value = 0;
+            miniTranslateY.value = 0;
+        }
+    }, [minimized]);
 
     const [liked, setLiked] = React.useState(false);
     const [likeCount, setLikeCount] = React.useState(1200);
@@ -71,14 +108,15 @@ export default function VideoPlayerOverlay() {
     const handleShare = async () => {
         if (!activeVideo) return;
         try {
-            await Share.share({ message: `${activeVideo.title} — https://www.youtube.com/watch?v=${activeVideo.youtubeId}` });
+            await Share.share({ message: activeVideo.title });
         } catch { }
     };
 
     const handleComment = () => Alert.alert('Comments', 'Comments will be available soon.');
     const handleDownload = () => Alert.alert('Download', 'Downloads will be available soon.');
 
-    const pan = Gesture.Pan()
+    // Drag DOWN on the expanded player to minimize it into the PiP window.
+    const minimizePan = Gesture.Pan()
         .enabled(!minimized)
         .activeOffsetY([-1, 10])
         .onChange((event) => {
@@ -94,21 +132,40 @@ export default function VideoPlayerOverlay() {
             }
         });
 
+    // Once minimized, the PiP window can be freely dragged anywhere on screen.
+    const dragPan = Gesture.Pan()
+        .enabled(minimized)
+        .onBegin(() => {
+            dragStartX.value = miniTranslateX.value;
+            dragStartY.value = miniTranslateY.value;
+        })
+        .onChange((event) => {
+            const minX = 8 - baseLeftMini;
+            const maxX = (SCREEN_W - MINI_WIDTH - 8) - baseLeftMini;
+            const minY = (insets.top + 8) - baseTopMini;
+            const maxY = (SCREEN_H - MINI_HEIGHT - 8) - baseTopMini;
+
+            const nx = dragStartX.value + event.translationX;
+            const ny = dragStartY.value + event.translationY;
+
+            miniTranslateX.value = Math.min(maxX, Math.max(minX, nx));
+            miniTranslateY.value = Math.min(maxY, Math.max(minY, ny));
+        });
+
     const tap = Gesture.Tap()
         .enabled(minimized)
         .onEnd(() => {
             scheduleOnRN(expand);
         });
 
-    // The bounding box that clips/positions the player. The actual YoutubePlayer
-    // is rendered at a FIXED size always (see below) and only visually scaled via
-    // a transform, so its internal WebView never resizes/reloads — that resize
-    // was what caused the drag glitching and playback restarting.
+    // The bounding box that clips/positions the player. The actual video view
+    // is rendered at a FIXED size always (see below) and only visually scaled
+    // via a transform, so it never resizes/reflows mid-gesture.
     const boxStyle = useAnimatedStyle(() => {
         const width = interpolate(progress.value, [0, 1], [SCREEN_W, MINI_WIDTH], Extrapolation.CLAMP);
         const height = interpolate(progress.value, [0, 1], [PLAYER_HEIGHT_FULL, MINI_HEIGHT], Extrapolation.CLAMP);
-        const top = interpolate(progress.value, [0, 1], [0, MINI_MARGIN_TOP], Extrapolation.CLAMP);
-        const left = interpolate(progress.value, [0, 1], [0, SCREEN_W - MINI_WIDTH - MINI_MARGIN_RIGHT], Extrapolation.CLAMP);
+        const top = interpolate(progress.value, [0, 1], [0, baseTopMini], Extrapolation.CLAMP) + miniTranslateY.value * progress.value;
+        const left = interpolate(progress.value, [0, 1], [0, baseLeftMini], Extrapolation.CLAMP) + miniTranslateX.value * progress.value;
         const borderRadius = interpolate(progress.value, [0, 1], [0, 12], Extrapolation.CLAMP);
         return {
             position: 'absolute',
@@ -139,8 +196,8 @@ export default function VideoPlayerOverlay() {
 
     const miniCloseStyle = useAnimatedStyle(() => {
         const opacity = interpolate(progress.value, [0.7, 1], [0, 1], Extrapolation.CLAMP);
-        const top = interpolate(progress.value, [0, 1], [0, MINI_MARGIN_TOP], Extrapolation.CLAMP);
-        const left = interpolate(progress.value, [0, 1], [0, SCREEN_W - MINI_WIDTH - MINI_MARGIN_RIGHT], Extrapolation.CLAMP);
+        const top = interpolate(progress.value, [0, 1], [0, baseTopMini], Extrapolation.CLAMP) + miniTranslateY.value * progress.value;
+        const left = interpolate(progress.value, [0, 1], [0, baseLeftMini], Extrapolation.CLAMP) + miniTranslateX.value * progress.value;
         return { opacity, top: top - 8, left: left + MINI_WIDTH - 10 };
     });
 
@@ -222,22 +279,34 @@ export default function VideoPlayerOverlay() {
                 </ScrollView>
             </Animated.View>
 
-            <GestureDetector gesture={Gesture.Simultaneous(pan, tap)}>
+            <GestureDetector gesture={Gesture.Simultaneous(minimizePan, dragPan, tap)}>
                 <Animated.View style={boxStyle}>
                     <Animated.View style={scaleStyle}>
-                        <YoutubePlayer
-                            height={PLAYER_HEIGHT_FULL}
-                            width={SCREEN_W}
-                            videoId={activeVideo.youtubeId}
-                            play
-                            initialPlayerParams={{
-                                controls: 1,
-                                modestbranding: 1,
-                                rel: 0,
-                                iv_load_policy: 3,
-                            }}
+                        <VideoView
+                            player={player}
+                            style={{ width: SCREEN_W, height: PLAYER_HEIGHT_FULL }}
+                            contentFit="cover"
+                            nativeControls={!minimized}
                         />
                     </Animated.View>
+
+                    {!isReady && !minimized && (
+                        <View
+                            pointerEvents="none"
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: '#000',
+                            }}
+                        >
+                            <ActivityIndicator color="#fff" size="large" />
+                        </View>
+                    )}
                 </Animated.View>
             </GestureDetector>
 

@@ -75,18 +75,32 @@ export default function VideosScreen() {
                     right: 0,
                     height: headerHeight,
                     transform: [{ translateY }],
-                    overflow: 'hidden',
+                    borderBottomLeftRadius: 24,
+                    borderBottomRightRadius: 24,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: isDark ? 0.45 : 0.1,
+                    shadowRadius: 10,
+                    elevation: 8,
                 }}
             >
-                <BlurView
-                    intensity={22}
-                    tint={isDark ? 'dark' : 'light'}
+                <View
                     style={{
                         flex: 1,
-                        paddingTop: insets.top,
-                        backgroundColor: isDark ? 'rgba(18,18,18,0.82)' : 'rgba(255,255,255,0.86)',
+                        overflow: 'hidden',
+                        borderBottomLeftRadius: 24,
+                        borderBottomRightRadius: 24,
                     }}
                 >
+                    <BlurView
+                        intensity={22}
+                        tint={isDark ? 'dark' : 'light'}
+                        style={{
+                            flex: 1,
+                            paddingTop: insets.top,
+                            backgroundColor: isDark ? 'rgba(18,18,18,0.82)' : 'rgba(255,255,255,0.86)',
+                        }}
+                    >
                     <View style={{ height: TITLE_ROW_HEIGHT }} className="flex-row items-center justify-between px-4">
                         <Text className="text-xl font-elms-med text-gray-900 dark:text-white">
                             Videos
@@ -112,7 +126,8 @@ export default function VideosScreen() {
                     </View>
 
                     <VideoTopicsMarquee isDark={isDark} />
-                </BlurView>
+                    </BlurView>
+                </View>
             </Animated.View>
         </View>
     );

@@ -14,7 +14,7 @@ export default function UpNextCard({ video, isDark, onPress }: { video: DemoVide
         >
             <View className="aspect-video relative">
                 <Image
-                    source={{ uri: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg` }}
+                    source={{ uri: video.thumbnail }}
                     className="w-full h-full"
                     resizeMode="cover"
                 />

@@ -61,36 +61,48 @@ export default function TabLayout() {
                         <TabSlot />
                     </AppDrawerContext.Provider>
 
-                    <TabList
+                    <View
                         style={{
-                            paddingBottom: insets.bottom,
+                            borderTopLeftRadius: 28,
+                            borderTopRightRadius: 28,
+                            shadowColor: '#000',
+                            shadowOffset: { width: 0, height: -4 },
+                            shadowOpacity: isDark ? 0.5 : 0.12,
+                            shadowRadius: 14,
+                            elevation: 12,
                         }}
-                        className={`w-full flex-row items-center justify-around px-3 py-1.5 rounded-t-[28px] ${isDark ? 'bg-black' : 'bg-white'}`}
                     >
-                        <TabTrigger name="setting" href={'/setting'} style={{ display: 'none' }} />
-                        <TabTrigger name="music library" href={'/(tabs)/music_library'} style={{ display: 'none' }} />
-                        {/* <TabTrigger name="playlist" href={'/(tabs)/playlist'} style={{ display: 'none' }} /> */}
-                        <TabTrigger name="index" href={"/home"}>
-                            <CustomeTab name="Music" Icon={Home} isActive={pathname.startsWith('/home')} />
-                        </TabTrigger>
+                        <TabList
+                            style={{
+                                paddingBottom: insets.bottom,
+                            }}
+                            className={`w-full flex-row items-center justify-around px-3 py-1.5 rounded-t-[28px] ${isDark ? 'bg-black' : 'bg-white'}`}
+                        >
+                            <TabTrigger name="setting" href={'/setting'} style={{ display: 'none' }} />
+                            <TabTrigger name="music library" href={'/(tabs)/music_library'} style={{ display: 'none' }} />
+                            {/* <TabTrigger name="playlist" href={'/(tabs)/playlist'} style={{ display: 'none' }} /> */}
+                            <TabTrigger name="index" href={"/home"}>
+                                <CustomeTab name="Music" Icon={Home} isActive={pathname.startsWith('/home')} />
+                            </TabTrigger>
 
-                        <TabTrigger name="Search" href={"/search"}>
-                            <CustomeTab name="Search" Icon={Search} isActive={pathname.startsWith('/search')} />
-                        </TabTrigger>
+                            <TabTrigger name="Search" href={"/search"}>
+                                <CustomeTab name="Search" Icon={Search} isActive={pathname.startsWith('/search')} />
+                            </TabTrigger>
 
-                        <TabTrigger name="Videos" href={"/videos"}>
-                            <CustomeTab name="Videos" Icon={Video} isActive={pathname.startsWith('/videos')} />
-                        </TabTrigger>
+                            <TabTrigger name="Videos" href={"/videos"}>
+                                <CustomeTab name="Videos" Icon={Video} isActive={pathname.startsWith('/videos')} />
+                            </TabTrigger>
 
-                        <TabTrigger name="Vibes" href={"/shorts"}>
-                            <CustomeTab name="Shorts" image={isDark ? require('@/assets/arise/shorts-dark.png') : require('@/assets/arise/shorts.png')} isActive={pathname.startsWith('/shorts')} />
-                        </TabTrigger>
+                            <TabTrigger name="Vibes" href={"/shorts"}>
+                                <CustomeTab name="Shorts" image={isDark ? require('@/assets/arise/shorts-dark.png') : require('@/assets/arise/shorts.png')} isActive={pathname.startsWith('/shorts')} />
+                            </TabTrigger>
 
-                        <TabTrigger name="Library" href={"/library"}>
-                            <CustomeTab name="Library" Icon={Library} isActive={pathname.startsWith('/library')} />
-                        </TabTrigger>
+                            <TabTrigger name="Library" href={"/library"}>
+                                <CustomeTab name="Library" Icon={Library} isActive={pathname.startsWith('/library')} />
+                            </TabTrigger>
 
-                    </TabList>
+                        </TabList>
+                    </View>
                 </Tabs>
                 <AppDrawer onClose={handleClose} open={open} />
                 <Track />
