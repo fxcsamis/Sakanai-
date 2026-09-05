@@ -3,6 +3,7 @@
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { Play } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import Animated, {
@@ -17,6 +18,8 @@ import Animated, {
 import { DemoVideo } from './demoVideos';
 
 export default function VideoCard({ video, onPress }: { video: DemoVideo; onPress: (video: DemoVideo) => void }) {
+    const { colorScheme } = useColorScheme();
+    const isDark = colorScheme === 'dark';
     const [isPressed, setIsPressed] = React.useState(false);
     const float = useSharedValue(0);
 
@@ -38,20 +41,39 @@ export default function VideoCard({ video, onPress }: { video: DemoVideo; onPres
         ],
     }));
 
+    // Native elevation shadows barely show up on a near-black background,
+    // so the floating effect is faked with soft layered halos instead.
+    const haloColorOuter = isDark ? 'rgba(255,255,255,0.045)' : 'rgba(15,23,42,0.10)';
+    const haloColorInner = isDark ? 'rgba(255,255,255,0.075)' : 'rgba(15,23,42,0.16)';
+
     return (
         <View className="w-full px-4 mb-8">
-            <Animated.View
-                style={[
-                    floatStyle,
-                    {
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 14 },
-                        shadowOpacity: 0.18,
-                        shadowRadius: 20,
-                        elevation: 8,
-                    },
-                ]}
-            >
+            <Animated.View style={floatStyle}>
+                <View
+                    pointerEvents="none"
+                    style={{
+                        position: 'absolute',
+                        top: 14,
+                        left: 4,
+                        right: 4,
+                        bottom: -8,
+                        borderRadius: 32,
+                        backgroundColor: haloColorOuter,
+                    }}
+                />
+                <View
+                    pointerEvents="none"
+                    style={{
+                        position: 'absolute',
+                        top: 18,
+                        left: 12,
+                        right: 12,
+                        bottom: -3,
+                        borderRadius: 28,
+                        backgroundColor: haloColorInner,
+                    }}
+                />
+
                 <Pressable
                     onPress={() => onPress(video)}
                     onPressIn={() => setIsPressed(true)}
