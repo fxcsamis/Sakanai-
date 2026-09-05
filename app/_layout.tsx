@@ -11,7 +11,9 @@ import AppThemeProvider from '@/components/context/apptheme';
 import MusicContextProvider from '@/components/context/music';
 import RefreshProvider from '@/components/context/refresh';
 import ThemePreferenceProvider from '@/components/context/themePreference';
+import VideoPlayerProvider from '@/components/context/videoplayer';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import VideoPlayerOverlay from '@/components/VideoDetail/VideoPlayerOverlay';
 import '@/global.css';
 import { useSetupPlayer } from '@/hooks/useSetupPlayer';
 import { InitiateDataBase } from '@/service/database';
@@ -45,14 +47,16 @@ export default function Layout() {
               <AppThemeProvider colorTheme={colorScheme}>
                 <MusicContextProvider>
                   <RefreshProvider>
-                    <GluestackUIProvider mode={colorScheme ?? "light"} style={{ flex: 1 }}>
-                      <Stack screenOptions={{ headerShown: false }} >
-                        <Stack.Screen name='index' />
-                        <Stack.Screen name='(tabs)' />
-                        <Stack.Screen name='video/[id]' options={{ animation: 'slide_from_bottom' }} />
-                        <Stack.Screen name='video-search' options={{ animation: 'slide_from_right' }} />
-                      </Stack>
-                    </GluestackUIProvider>
+                    <VideoPlayerProvider>
+                      <GluestackUIProvider mode={colorScheme ?? "light"} style={{ flex: 1 }}>
+                        <Stack screenOptions={{ headerShown: false }} >
+                          <Stack.Screen name='index' />
+                          <Stack.Screen name='(tabs)' />
+                          <Stack.Screen name='video-search' options={{ animation: 'slide_from_right' }} />
+                        </Stack>
+                        <VideoPlayerOverlay />
+                      </GluestackUIProvider>
+                    </VideoPlayerProvider>
                   </RefreshProvider>
                 </MusicContextProvider>
               </AppThemeProvider>

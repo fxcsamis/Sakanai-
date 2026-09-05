@@ -8,6 +8,7 @@ import React from 'react';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FocusAwareStatusBar from '../common/FocusAwareStatusBar';
+import { useVideoPlayer } from '../context/videoplayer';
 import { DemoVideo, demoVideos } from '../Videos/demoVideos';
 import UpNextCard from '../VideoDetail/UpNextCard';
 
@@ -18,6 +19,7 @@ export default function VideoSearchScreen() {
     const router = useRouter();
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const { open } = useVideoPlayer();
 
     const [query, setQuery] = React.useState('');
     const [recent, setRecent] = React.useState<string[]>(['Big Buck Bunny', 'Open movie', 'Blender short film']);
@@ -37,7 +39,10 @@ export default function VideoSearchScreen() {
 
     const removeRecent = (term: string) => setRecent((prev) => prev.filter((t) => t !== term));
 
-    const handleOpenVideo = (video: DemoVideo) => router.push(`/video/${video.id}`);
+    const handleOpenVideo = (video: DemoVideo) => {
+        open(video);
+        router.back();
+    };
 
     const mutedColor = isDark ? '#B3B3B3' : '#64748B';
 

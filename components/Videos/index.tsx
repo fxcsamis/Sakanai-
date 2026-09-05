@@ -8,7 +8,8 @@ import React from 'react';
 import { Alert, Animated, FlatList, NativeScrollEvent, NativeSyntheticEvent, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FocusAwareStatusBar from '../common/FocusAwareStatusBar';
-import { DemoVideo, demoVideos } from './demoVideos';
+import { useVideoPlayer } from '../context/videoplayer';
+import { demoVideos } from './demoVideos';
 import VideoCard from './VideoCard';
 import VideoTopicsMarquee from './VideoTopicsMarquee';
 
@@ -20,6 +21,7 @@ export default function VideosScreen() {
     const insets = useSafeAreaInsets();
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const { open } = useVideoPlayer();
 
     const headerHeight = insets.top + TITLE_ROW_HEIGHT + MARQUEE_ROW_HEIGHT;
 
@@ -48,7 +50,7 @@ export default function VideosScreen() {
 
     const handleDownload = () => Alert.alert('Download', 'Downloads will be available soon.');
 
-    const handleOpenVideo = (video: DemoVideo) => router.push(`/video/${video.id}`);
+    const handleOpenVideo = (video: (typeof demoVideos)[number]) => open(video);
 
     return (
         <View className="flex-1 bg-white dark:bg-[#121212]">
