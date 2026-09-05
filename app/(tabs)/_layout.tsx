@@ -65,7 +65,7 @@ export default function TabLayout() {
                         style={{
                             paddingBottom: insets.bottom,
                         }}
-                        className={`w-full flex-row items-center justify-around px-3 py-1.5 rounded-t-[28px] shadow-2xl ${isDark ? 'bg-black' : 'bg-white'}`}
+                        className={`w-full flex-row items-center justify-around px-3 py-1.5 rounded-t-[28px] ${isDark ? 'bg-black' : 'bg-white'}`}
                     >
                         <TabTrigger name="setting" href={'/setting'} style={{ display: 'none' }} />
                         <TabTrigger name="music library" href={'/(tabs)/music_library'} style={{ display: 'none' }} />

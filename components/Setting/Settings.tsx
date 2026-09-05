@@ -78,7 +78,7 @@ export default function Settings({ onTerm }: { onTerm: () => void }) {
     }
 
     return (
-        <View className="px-3 pt-6">
+        <View className="px-1 pt-6">
 
             <View className="bg-white dark:bg-[#181818] rounded-xl p-5 shadow-sm dark:shadow-none border border-slate-100 dark:border-transparent mb-6 items-center">
                 <TouchableOpacity
