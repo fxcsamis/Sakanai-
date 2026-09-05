@@ -22,6 +22,7 @@ import {
     ThumbsUp,
     X,
 } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useVideoPlayer } from '../context/videoplayer';
 import { DemoVideo, demoVideos } from '../Videos/demoVideos';
 import UpNextCard from './UpNextCard';
@@ -30,14 +31,17 @@ const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const PLAYER_HEIGHT_FULL = (SCREEN_W * 9) / 16;
 const MINI_WIDTH = 160;
 const MINI_HEIGHT = (MINI_WIDTH * 9) / 16;
-const MINI_MARGIN_RIGHT = 12;
-const MINI_MARGIN_BOTTOM = 78;
+const MINI_MARGIN_RIGHT = 10;
+const MINI_SCALE = MINI_WIDTH / SCREEN_W;
 const DRAG_DISTANCE = SCREEN_H * 0.35;
 
 export default function VideoPlayerOverlay() {
     const { activeVideo, minimized, minimize, expand, close, open } = useVideoPlayer();
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const insets = useSafeAreaInsets();
+
+    const MINI_MARGIN_TOP = insets.top + 66;
 
     const progress = useSharedValue(0);
 
@@ -96,12 +100,16 @@ export default function VideoPlayerOverlay() {
             scheduleOnRN(expand);
         });
 
-    const playerBoxStyle = useAnimatedStyle(() => {
+    // The bounding box that clips/positions the player. The actual YoutubePlayer
+    // is rendered at a FIXED size always (see below) and only visually scaled via
+    // a transform, so its internal WebView never resizes/reloads — that resize
+    // was what caused the drag glitching and playback restarting.
+    const boxStyle = useAnimatedStyle(() => {
         const width = interpolate(progress.value, [0, 1], [SCREEN_W, MINI_WIDTH], Extrapolation.CLAMP);
         const height = interpolate(progress.value, [0, 1], [PLAYER_HEIGHT_FULL, MINI_HEIGHT], Extrapolation.CLAMP);
-        const top = interpolate(progress.value, [0, 1], [0, SCREEN_H - MINI_HEIGHT - MINI_MARGIN_BOTTOM], Extrapolation.CLAMP);
+        const top = interpolate(progress.value, [0, 1], [0, MINI_MARGIN_TOP], Extrapolation.CLAMP);
         const left = interpolate(progress.value, [0, 1], [0, SCREEN_W - MINI_WIDTH - MINI_MARGIN_RIGHT], Extrapolation.CLAMP);
-        const borderRadius = interpolate(progress.value, [0, 1], [0, 14], Extrapolation.CLAMP);
+        const borderRadius = interpolate(progress.value, [0, 1], [0, 12], Extrapolation.CLAMP);
         return {
             position: 'absolute',
             top,
@@ -113,6 +121,17 @@ export default function VideoPlayerOverlay() {
         };
     });
 
+    const scaleStyle = useAnimatedStyle(() => {
+        const scale = interpolate(progress.value, [0, 1], [1, MINI_SCALE], Extrapolation.CLAMP);
+        return {
+            width: SCREEN_W,
+            height: PLAYER_HEIGHT_FULL,
+            transform: [{ scale }],
+            // @ts-ignore - RN 0.81 supports transformOrigin
+            transformOrigin: 'top left',
+        };
+    });
+
     const infoPanelStyle = useAnimatedStyle(() => {
         const opacity = interpolate(progress.value, [0, 0.3], [1, 0], Extrapolation.CLAMP);
         return { opacity };
@@ -120,7 +139,9 @@ export default function VideoPlayerOverlay() {
 
     const miniCloseStyle = useAnimatedStyle(() => {
         const opacity = interpolate(progress.value, [0.7, 1], [0, 1], Extrapolation.CLAMP);
-        return { opacity };
+        const top = interpolate(progress.value, [0, 1], [0, MINI_MARGIN_TOP], Extrapolation.CLAMP);
+        const left = interpolate(progress.value, [0, 1], [0, SCREEN_W - MINI_WIDTH - MINI_MARGIN_RIGHT], Extrapolation.CLAMP);
+        return { opacity, top: top - 8, left: left + MINI_WIDTH - 10 };
     });
 
     if (!activeVideo) return null;
@@ -202,37 +223,26 @@ export default function VideoPlayerOverlay() {
             </Animated.View>
 
             <GestureDetector gesture={Gesture.Simultaneous(pan, tap)}>
-                <Animated.View style={playerBoxStyle}>
-                    <YoutubePlayer
-                        height={minimized ? MINI_HEIGHT : PLAYER_HEIGHT_FULL}
-                        width={minimized ? MINI_WIDTH : SCREEN_W}
-                        videoId={activeVideo.youtubeId}
-                        play
-                        initialPlayerParams={{
-                            controls: minimized ? 0 : 1,
-                            modestbranding: 1,
-                            rel: 0,
-                            iv_load_policy: 3,
-                        }}
-                    />
-
-                    {!minimized && (
-                        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 40 }} pointerEvents="none" />
-                    )}
+                <Animated.View style={boxStyle}>
+                    <Animated.View style={scaleStyle}>
+                        <YoutubePlayer
+                            height={PLAYER_HEIGHT_FULL}
+                            width={SCREEN_W}
+                            videoId={activeVideo.youtubeId}
+                            play
+                            initialPlayerParams={{
+                                controls: 1,
+                                modestbranding: 1,
+                                rel: 0,
+                                iv_load_policy: 3,
+                            }}
+                        />
+                    </Animated.View>
                 </Animated.View>
             </GestureDetector>
 
             {minimized && (
-                <Animated.View
-                    style={[
-                        miniCloseStyle,
-                        {
-                            position: 'absolute',
-                            top: SCREEN_H - MINI_HEIGHT - MINI_MARGIN_BOTTOM - 10,
-                            left: SCREEN_W - MINI_WIDTH - MINI_MARGIN_RIGHT - 2,
-                        },
-                    ]}
-                >
+                <Animated.View style={[miniCloseStyle, { position: 'absolute' }]}>
                     <Pressable onPress={close} hitSlop={10} className="bg-black rounded-full p-1">
                         <X color="white" size={13} />
                     </Pressable>

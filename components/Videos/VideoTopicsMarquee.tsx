@@ -2,14 +2,7 @@
 // See LICENSE for details.
 
 import React from 'react';
-import { LayoutChangeEvent, Text, View } from 'react-native';
-import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withTiming,
-} from 'react-native-reanimated';
+import { ScrollView, Text, View } from 'react-native';
 
 const TOPICS = ['🔥 Trending videos', '⚡ Viral videos', '🎬 Movies', '🎵 Music videos', '📺 Live streams'];
 
@@ -35,42 +28,17 @@ function Pill({ text, isDark }: { text: string; isDark: boolean }) {
 }
 
 export default function VideoTopicsMarquee({ isDark }: { isDark: boolean }) {
-    const translateX = useSharedValue(0);
-    const [setWidth, setSetWidth] = React.useState(0);
-
-    const onLayoutSet = (e: LayoutChangeEvent) => {
-        const width = e.nativeEvent.layout.width;
-        if (width > 0 && width !== setWidth) setSetWidth(width);
-    };
-
-    React.useEffect(() => {
-        if (setWidth <= 0) return;
-        translateX.value = 0;
-        translateX.value = withRepeat(
-            withTiming(-setWidth, { duration: setWidth * 18, easing: Easing.linear }),
-            -1,
-            false
-        );
-    }, [setWidth]);
-
-    const style = useAnimatedStyle(() => ({
-        transform: [{ translateX: translateX.value }],
-    }));
-
     return (
-        <View style={{ height: 36, overflow: 'hidden' }} pointerEvents="none">
-            <Animated.View style={[{ flexDirection: 'row' }, style]}>
-                <View style={{ flexDirection: 'row' }} onLayout={onLayoutSet}>
-                    {TOPICS.map((t, i) => (
-                        <Pill key={`a-${i}`} text={t} isDark={isDark} />
-                    ))}
-                </View>
-                <View style={{ flexDirection: 'row' }}>
-                    {TOPICS.map((t, i) => (
-                        <Pill key={`b-${i}`} text={t} isDark={isDark} />
-                    ))}
-                </View>
-            </Animated.View>
+        <View style={{ height: 36 }}>
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 4, alignItems: 'center' }}
+            >
+                {TOPICS.map((t, i) => (
+                    <Pill key={i} text={t} isDark={isDark} />
+                ))}
+            </ScrollView>
         </View>
     );
 }

@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
+import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import { Download, Search } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
@@ -67,42 +68,51 @@ export default function VideosScreen() {
             />
 
             <Animated.View
-                className="bg-white dark:bg-[#121212]"
                 style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     right: 0,
                     height: headerHeight,
-                    paddingTop: insets.top,
                     transform: [{ translateY }],
+                    overflow: 'hidden',
                 }}
             >
-                <View style={{ height: TITLE_ROW_HEIGHT }} className="flex-row items-center justify-between px-4">
-                    <Text className="text-xl font-elms-med text-gray-900 dark:text-white">
-                        Videos
-                    </Text>
+                <BlurView
+                    intensity={22}
+                    tint={isDark ? 'dark' : 'light'}
+                    style={{
+                        flex: 1,
+                        paddingTop: insets.top,
+                        backgroundColor: isDark ? 'rgba(18,18,18,0.82)' : 'rgba(255,255,255,0.86)',
+                    }}
+                >
+                    <View style={{ height: TITLE_ROW_HEIGHT }} className="flex-row items-center justify-between px-4">
+                        <Text className="text-xl font-elms-med text-gray-900 dark:text-white">
+                            Videos
+                        </Text>
 
-                    <View className="flex-row items-center gap-2">
-                        <Pressable
-                            onPress={handleSearch}
-                            hitSlop={8}
-                            className="bg-slate-50 dark:bg-[#242424] p-2 rounded-full"
-                        >
-                            <Search color={isDark ? 'white' : 'black'} size={18} />
-                        </Pressable>
+                        <View className="flex-row items-center gap-2">
+                            <Pressable
+                                onPress={handleSearch}
+                                hitSlop={8}
+                                className="bg-slate-50 dark:bg-[#242424] p-2 rounded-full"
+                            >
+                                <Search color={isDark ? 'white' : 'black'} size={18} />
+                            </Pressable>
 
-                        <Pressable
-                            onPress={handleDownload}
-                            hitSlop={8}
-                            className="bg-slate-50 dark:bg-[#242424] p-2 rounded-full"
-                        >
-                            <Download color={isDark ? 'white' : 'black'} size={18} />
-                        </Pressable>
+                            <Pressable
+                                onPress={handleDownload}
+                                hitSlop={8}
+                                className="bg-slate-50 dark:bg-[#242424] p-2 rounded-full"
+                            >
+                                <Download color={isDark ? 'white' : 'black'} size={18} />
+                            </Pressable>
+                        </View>
                     </View>
-                </View>
 
-                <VideoTopicsMarquee isDark={isDark} />
+                    <VideoTopicsMarquee isDark={isDark} />
+                </BlurView>
             </Animated.View>
         </View>
     );
