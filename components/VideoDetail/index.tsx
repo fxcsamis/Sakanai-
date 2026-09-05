@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
-import { AppTheme } from '@/components/context/apptheme';
-import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
     ArrowLeft,
@@ -27,9 +25,8 @@ export default function VideoDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { theme } = useAppTheme();
     const { colorScheme } = useColorScheme();
-    const isDark = (colorScheme === 'dark' ? colorScheme : theme) === AppTheme.dark;
+    const isDark = colorScheme === 'dark';
 
     const video = React.useMemo<DemoVideo | undefined>(
         () => demoVideos.find((v) => v.id === id),

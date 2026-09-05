@@ -3,10 +3,8 @@
 
 import AppDrawer from "@/components/common/AppDrawer";
 import CustomeTab from "@/components/common/CustomeTab";
-import { AppTheme } from "@/components/context/apptheme";
 import TrackpanelProvider from "@/components/context/trackpanel";
 import Track from "@/components/track";
-import { useAppTheme } from "@/hooks/useAppTheme";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setDatabase } from "@/service/database-instance";
 import { setCurrentIndex } from "@/store/reducer/trackplayerSlice";
@@ -29,9 +27,8 @@ export default function TabLayout() {
     const db = useSQLiteContext();
     const insets = useSafeAreaInsets();
     const [open, setOpen] = React.useState<boolean>(false);
-    const { theme } = useAppTheme();
     const { colorScheme } = useColorScheme();
-    const _theme = colorScheme === 'dark' ? colorScheme : theme;
+    const isDark = colorScheme === 'dark';
     const track = useActiveTrack();
     const trackSlice = useAppSelector(state => state.trackReducer);
     const dispatch = useAppDispatch();
@@ -68,7 +65,7 @@ export default function TabLayout() {
                         style={{
                             paddingBottom: insets.bottom,
                         }}
-                        className={`w-full flex-row items-center justify-around px-3 py-1.5 rounded-t-[28px] shadow-2xl ${_theme === AppTheme.dark ? 'bg-black' : 'bg-white'}`}
+                        className={`w-full flex-row items-center justify-around px-3 py-1.5 rounded-t-[28px] shadow-2xl ${isDark ? 'bg-black' : 'bg-white'}`}
                     >
                         <TabTrigger name="setting" href={'/setting'} style={{ display: 'none' }} />
                         <TabTrigger name="music library" href={'/(tabs)/music_library'} style={{ display: 'none' }} />
@@ -86,7 +83,7 @@ export default function TabLayout() {
                         </TabTrigger>
 
                         <TabTrigger name="Vibes" href={"/shorts"}>
-                            <CustomeTab name="Shorts" image={_theme === AppTheme.dark ? require('@/assets/arise/shorts-dark.png') : require('@/assets/arise/shorts.png')} isActive={pathname.startsWith('/shorts')} />
+                            <CustomeTab name="Shorts" image={isDark ? require('@/assets/arise/shorts-dark.png') : require('@/assets/arise/shorts.png')} isActive={pathname.startsWith('/shorts')} />
                         </TabTrigger>
 
                         <TabTrigger name="Library" href={"/library"}>

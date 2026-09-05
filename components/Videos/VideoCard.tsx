@@ -18,59 +18,44 @@ import { DemoVideo } from './demoVideos';
 
 export default function VideoCard({ video, onPress }: { video: DemoVideo; onPress: (video: DemoVideo) => void }) {
     const [isPressed, setIsPressed] = React.useState(false);
-    const glow = useSharedValue(0.4);
+    const float = useSharedValue(0);
 
     React.useEffect(() => {
-        glow.value = withRepeat(
+        float.value = withRepeat(
             withSequence(
-                withTiming(0.9, { duration: 1800, easing: Easing.inOut(Easing.ease) }),
-                withTiming(0.4, { duration: 1800, easing: Easing.inOut(Easing.ease) }),
+                withTiming(1, { duration: 2200, easing: Easing.inOut(Easing.ease) }),
+                withTiming(0, { duration: 2200, easing: Easing.inOut(Easing.ease) }),
             ),
             -1,
             true
         );
     }, []);
 
-    const cardStyle = useAnimatedStyle(() => ({
+    const floatStyle = useAnimatedStyle(() => ({
         transform: [
+            { translateY: float.value * -3 },
             { scale: withSpring(isPressed ? 0.97 : 1, { mass: 0.3, damping: 15, stiffness: 220 }) },
         ],
     }));
 
-    const glowStyle = useAnimatedStyle(() => ({
-        opacity: glow.value,
-    }));
-
     return (
-        <View className="w-full px-4 mb-6">
-            <Animated.View style={cardStyle}>
-                {/* premium ambient glow behind the card */}
-                <Animated.View
-                    style={[
-                        glowStyle,
-                        {
-                            position: 'absolute',
-                            top: 6,
-                            left: 6,
-                            right: 6,
-                            bottom: -2,
-                            borderRadius: 28,
-                            backgroundColor: '#6C5CE7',
-                        },
-                    ]}
-                />
-
+        <View className="w-full px-4 mb-8">
+            <Animated.View
+                style={[
+                    floatStyle,
+                    {
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 14 },
+                        shadowOpacity: 0.18,
+                        shadowRadius: 20,
+                        elevation: 8,
+                    },
+                ]}
+            >
                 <Pressable
                     onPress={() => onPress(video)}
                     onPressIn={() => setIsPressed(true)}
                     onPressOut={() => setIsPressed(false)}
-                    style={{
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 10 },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 18,
-                        elevation: 10,
-                    }}
                 >
                     <View className="rounded-3xl overflow-hidden bg-gray-100 dark:bg-[#181818] aspect-video relative border border-black/5 dark:border-white/10">
                         <Image

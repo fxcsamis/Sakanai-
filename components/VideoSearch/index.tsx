@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
-import { AppTheme } from '@/components/context/apptheme';
-import { useAppTheme } from '@/hooks/useAppTheme';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, History, Mic, Search as SearchIcon, TrendingUp, X } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
@@ -18,9 +16,8 @@ const BADGE_COLORS = ['#EF4444', '#F97316', '#F59E0B', '#94A3B8', '#94A3B8'];
 
 export default function VideoSearchScreen() {
     const router = useRouter();
-    const { theme } = useAppTheme();
     const { colorScheme } = useColorScheme();
-    const isDark = (colorScheme === 'dark' ? colorScheme : theme) === AppTheme.dark;
+    const isDark = colorScheme === 'dark';
 
     const [query, setQuery] = React.useState('');
     const [recent, setRecent] = React.useState<string[]>(['Big Buck Bunny', 'Open movie', 'Blender short film']);

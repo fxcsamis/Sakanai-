@@ -1,19 +1,15 @@
 // Copyright (c) 2026 Raj 
 // See LICENSE for details.
 
-import { useAppTheme } from '@/hooks/useAppTheme';
 import { LucideProps } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import React from 'react';
 import { Image, ImageSourcePropType, Text } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
-import { AppTheme } from '../context/apptheme';
 
 export default function CustomeTab({ name, Icon, image = null, isActive = false }: { name: string, Icon?: React.ForwardRefExoticComponent<LucideProps & React.RefAttributes<SVGSVGElement>> | null, image?: ImageSourcePropType | null, isActive?: boolean }) {
-    const { theme } = useAppTheme();
     const { colorScheme } = useColorScheme();
-    const _theme = colorScheme === 'dark' ? colorScheme : theme;
-    const isDark = _theme === AppTheme.dark;
+    const isDark = colorScheme === 'dark';
 
     const pillStyle = useAnimatedStyle(() => ({
         transform: [
