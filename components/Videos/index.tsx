@@ -11,8 +11,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FocusAwareStatusBar from '../common/FocusAwareStatusBar';
 import { DemoVideo, demoVideos } from './demoVideos';
 import VideoCard from './VideoCard';
+import VideoTopicsMarquee from './VideoTopicsMarquee';
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+const TITLE_ROW_HEIGHT = 52;
+const MARQUEE_ROW_HEIGHT = 36;
 
 export default function VideosScreen() {
     const router = useRouter();
@@ -20,10 +23,10 @@ export default function VideosScreen() {
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
 
-    const headerHeight = insets.top + 56;
+    const headerHeight = insets.top + TITLE_ROW_HEIGHT + MARQUEE_ROW_HEIGHT;
 
     const translateY = React.useRef(new Animated.Value(0)).current;
-    const blurIntensity = React.useRef(new Animated.Value(0)).current;
+    const blurIntensity = React.useRef(new Animated.Value(35)).current;
     const translateYNum = React.useRef(0);
     const lastOffset = React.useRef(0);
 
@@ -35,7 +38,7 @@ export default function VideosScreen() {
         if (y <= 0) {
             translateYNum.current = 0;
             translateY.setValue(0);
-            blurIntensity.setValue(0);
+            blurIntensity.setValue(35);
             return;
         }
 
@@ -45,7 +48,7 @@ export default function VideosScreen() {
 
         translateY.setValue(next);
         const progress = Math.abs(next) / headerHeight;
-        blurIntensity.setValue(progress * 100);
+        blurIntensity.setValue(35 + progress * 65);
     };
 
     const handleSearch = () => router.push('/video-search');
@@ -87,7 +90,7 @@ export default function VideosScreen() {
                         overflow: 'hidden',
                     }}
                 >
-                    <View className="flex-1 flex-row items-center justify-between px-4">
+                    <View style={{ height: TITLE_ROW_HEIGHT }} className="flex-row items-center justify-between px-4">
                         <Text className="text-xl font-elms-med text-gray-900 dark:text-white">
                             Videos
                         </Text>
@@ -96,7 +99,14 @@ export default function VideosScreen() {
                             <Pressable
                                 onPress={handleSearch}
                                 hitSlop={8}
-                                className="bg-slate-50/70 dark:bg-white/10 p-2 rounded-full border border-slate-100 dark:border-white/10"
+                                style={{
+                                    shadowColor: '#000',
+                                    shadowOffset: { width: 0, height: 3 },
+                                    shadowOpacity: isDark ? 0.35 : 0.12,
+                                    shadowRadius: 6,
+                                    elevation: 4,
+                                }}
+                                className="bg-white dark:bg-[#242424] p-2 rounded-full"
                             >
                                 <Search color={isDark ? 'white' : 'black'} size={18} />
                             </Pressable>
@@ -104,12 +114,21 @@ export default function VideosScreen() {
                             <Pressable
                                 onPress={handleDownload}
                                 hitSlop={8}
-                                className="bg-slate-50/70 dark:bg-white/10 p-2 rounded-full border border-slate-100 dark:border-white/10"
+                                style={{
+                                    shadowColor: '#000',
+                                    shadowOffset: { width: 0, height: 3 },
+                                    shadowOpacity: isDark ? 0.35 : 0.12,
+                                    shadowRadius: 6,
+                                    elevation: 4,
+                                }}
+                                className="bg-white dark:bg-[#242424] p-2 rounded-full"
                             >
                                 <Download color={isDark ? 'white' : 'black'} size={18} />
                             </Pressable>
                         </View>
                     </View>
+
+                    <VideoTopicsMarquee isDark={isDark} />
                 </AnimatedBlurView>
             </Animated.View>
         </View>
