@@ -33,6 +33,9 @@ jobs:
       - name: Prebuild native android project
         run: npx expo prebuild --platform android --clean
 
+      - name: Increase Gradle memory (fixes OutOfMemoryError during packaging)
+        run: echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
+
       - name: Build release APK (standalone, no dev server needed)
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon
