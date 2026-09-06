@@ -27,9 +27,9 @@ function Pill({ text, isDark }: { text: string; isDark: boolean }) {
     );
 }
 
-export default function VideoTopicsMarquee({ isDark }: { isDark: boolean }) {
+export default function VideoTopicsMarquee({ isDark, backgroundColor }: { isDark: boolean; backgroundColor?: string }) {
     return (
-        <View style={{ height: 36 }}>
+        <View style={{ height: 36, backgroundColor }}>
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}

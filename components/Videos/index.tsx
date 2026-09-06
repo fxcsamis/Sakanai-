@@ -125,7 +125,10 @@ export default function VideosScreen() {
                         </View>
                     </View>
 
-                    <VideoTopicsMarquee isDark={isDark} />
+                    <VideoTopicsMarquee
+                        isDark={isDark}
+                        backgroundColor={isDark ? 'rgba(18,18,18,0.82)' : 'rgba(255,255,255,0.86)'}
+                    />
                     </BlurView>
                 </View>
             </Animated.View>

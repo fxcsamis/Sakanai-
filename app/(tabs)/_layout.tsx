@@ -65,10 +65,10 @@ export default function TabLayout() {
                         style={{
                             paddingBottom: insets.bottom,
                             shadowColor: '#000',
-                            shadowOffset: { width: 0, height: -4 },
-                            shadowOpacity: isDark ? 0.5 : 0.12,
-                            shadowRadius: 14,
-                            elevation: 12,
+                            shadowOffset: { width: 0, height: -2 },
+                            shadowOpacity: isDark ? 0.35 : 0.1,
+                            shadowRadius: 6,
+                            elevation: 6,
                         }}
                         className={`w-full flex-row items-center justify-around px-3 py-1.5 rounded-t-[28px] ${isDark ? 'bg-black' : 'bg-white'}`}
                     >

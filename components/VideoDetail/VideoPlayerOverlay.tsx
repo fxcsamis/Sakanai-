@@ -29,7 +29,7 @@ import UpNextCard from './UpNextCard';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const PLAYER_HEIGHT_FULL = (SCREEN_W * 9) / 16;
-const MINI_WIDTH = 160;
+const MINI_WIDTH = 220;
 const MINI_HEIGHT = (MINI_WIDTH * 9) / 16;
 const MINI_MARGIN_RIGHT = 10;
 const MINI_SCALE = MINI_WIDTH / SCREEN_W;
@@ -69,20 +69,40 @@ function VideoPlayerOverlayInner() {
     });
 
     const [isReady, setIsReady] = React.useState(false);
+    const [loadError, setLoadError] = React.useState(false);
 
     React.useEffect(() => {
         if (!activeVideo) return;
         setIsReady(false);
+        setLoadError(false);
         player.replace(activeVideo.videoUrl);
         player.play();
     }, [activeVideo?.id]);
 
     React.useEffect(() => {
         const sub = player.addListener('statusChange', (payload: { status: string }) => {
-            if (payload.status === 'readyToPlay') setIsReady(true);
+            if (payload.status === 'readyToPlay') {
+                setIsReady(true);
+                setLoadError(false);
+            } else if (payload.status === 'error') {
+                setLoadError(true);
+            }
         });
+        // The player may already be ready (or already errored) by the time this
+        // listener attaches — without this check, a fast-loading video's status
+        // change can be missed entirely, leaving the spinner stuck forever.
+        if (player.status === 'readyToPlay') setIsReady(true);
+        if (player.status === 'error') setLoadError(true);
         return () => sub.remove();
     }, [player]);
+
+    const handleRetry = () => {
+        if (!activeVideo) return;
+        setLoadError(false);
+        setIsReady(false);
+        player.replace(activeVideo.videoUrl);
+        player.play();
+    };
 
     React.useEffect(() => {
         if (!activeVideo) return;
@@ -142,8 +162,12 @@ function VideoPlayerOverlayInner() {
         });
 
     // Once minimized, the PiP window can be freely dragged anywhere on screen.
+    // A small activation threshold keeps a quick tap from being swallowed by
+    // this pan gesture, so tapping to reopen still works.
     const dragPan = Gesture.Pan()
         .enabled(minimized)
+        .activeOffsetX([-6, 6])
+        .activeOffsetY([-6, 6])
         .onBegin(() => {
             dragStartX.value = miniTranslateX.value;
             dragStartY.value = miniTranslateY.value;
@@ -301,7 +325,7 @@ function VideoPlayerOverlayInner() {
 
                     {!isReady && !minimized && (
                         <View
-                            pointerEvents="none"
+                            pointerEvents={loadError ? 'auto' : 'none'}
                             style={{
                                 position: 'absolute',
                                 top: 0,
@@ -313,7 +337,19 @@ function VideoPlayerOverlayInner() {
                                 backgroundColor: '#000',
                             }}
                         >
-                            <ActivityIndicator color="#fff" size="large" />
+                            {loadError ? (
+                                <>
+                                    <Text style={{ color: 'white', marginBottom: 12 }}>Couldn't load this video</Text>
+                                    <Pressable
+                                        onPress={handleRetry}
+                                        style={{ backgroundColor: '#3B82F6', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 999 }}
+                                    >
+                                        <Text style={{ color: 'white', fontWeight: '600' }}>Retry</Text>
+                                    </Pressable>
+                                </>
+                            ) : (
+                                <ActivityIndicator color="#fff" size="large" />
+                            )}
                         </View>
                     )}
                 </Animated.View>
