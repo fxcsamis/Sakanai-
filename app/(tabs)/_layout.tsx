@@ -14,6 +14,7 @@ import { useSQLiteContext } from "expo-sqlite";
 import { Home, Library, Search, Video } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
 import React from "react";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useActiveTrack } from "react-native-track-player";
 
