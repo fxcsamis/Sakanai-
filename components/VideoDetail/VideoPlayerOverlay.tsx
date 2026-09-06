@@ -36,6 +36,15 @@ const MINI_SCALE = MINI_WIDTH / SCREEN_W;
 const DRAG_DISTANCE = SCREEN_H * 0.35;
 
 export default function VideoPlayerOverlay() {
+    const { activeVideo } = useVideoPlayer();
+    // Mounting expo-video's player hook is deferred until a video is actually
+    // opened — calling it unconditionally at the app root on every launch was
+    // causing the app to crash immediately on open.
+    if (!activeVideo) return null;
+    return <VideoPlayerOverlayInner />;
+}
+
+function VideoPlayerOverlayInner() {
     const { activeVideo, minimized, minimize, expand, close, open } = useVideoPlayer();
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
