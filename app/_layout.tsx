@@ -1,0 +1,74 @@
+// Copyright (c) 2026 Raj 
+// See LICENSE for details.
+
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { useFonts } from "expo-font";
+import { Stack } from 'expo-router';
+import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+import AppThemeProvider from '@/components/context/apptheme';
+import MusicContextProvider from '@/components/context/music';
+import RefreshProvider from '@/components/context/refresh';
+import ThemePreferenceProvider from '@/components/context/themePreference';
+import VideoPlayerProvider from '@/components/context/videoplayer';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import VideoPlayerOverlay from '@/components/VideoDetail/VideoPlayerOverlay';
+import '@/global.css';
+import { useSetupPlayer } from '@/hooks/useSetupPlayer';
+import { InitiateDataBase } from '@/service/database';
+import { store } from '@/store/store';
+import { SQLiteProvider } from 'expo-sqlite';
+import { useColorScheme } from 'nativewind';
+import { Provider } from 'react-redux';
+
+
+export default function Layout() {
+  const isReady = useSetupPlayer();
+  const [fontsLoaded] = useFonts({
+    ElmsSans_400: require('@/assets/font/ElmsSans-Regular.ttf'),
+    ElmsSans_500: require('@/assets/font/ElmsSans-Medium.ttf'),
+    ElmsSans_700: require('@/assets/font/ElmsSans-Bold.ttf'),
+
+    OldStandT_400: require('@/assets/font/OldStandardTT-Regular.ttf'),
+    OldStandT_700: require('@/assets/font/OldStandardTT-Bold.ttf'),
+  });
+  const { colorScheme } = useColorScheme();
+
+  if (!fontsLoaded || !isReady) return null;
+
+  return (
+
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Provider store={store}>
+          <ThemePreferenceProvider>
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <SQLiteProvider databaseName='arise_raj_sqlite.db' onInit={InitiateDataBase}>
+                <AppThemeProvider colorTheme={colorScheme}>
+                  <MusicContextProvider>
+                    <RefreshProvider>
+                      <VideoPlayerProvider>
+                        <GluestackUIProvider mode={colorScheme ?? "light"} style={{ flex: 1 }}>
+                          <Stack screenOptions={{ headerShown: false }} >
+                            <Stack.Screen name='index' />
+                            <Stack.Screen name='(tabs)' />
+                            <Stack.Screen name='video-search' options={{ animation: 'slide_from_right' }} />
+                            <Stack.Screen name='music-search' options={{ animation: 'fade', animationDuration: 150 }} />
+                            <Stack.Screen name='music-setting' options={{ animation: 'slide_from_right' }} />
+                          </Stack>
+                          <VideoPlayerOverlay />
+                        </GluestackUIProvider>
+                      </VideoPlayerProvider>
+                    </RefreshProvider>
+                  </MusicContextProvider>
+                </AppThemeProvider>
+              </SQLiteProvider>
+            </ThemeProvider>
+          </ThemePreferenceProvider>
+        </Provider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
+  );
+}
