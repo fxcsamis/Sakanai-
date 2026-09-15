@@ -14,7 +14,7 @@ import { Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 
 import FocusAwareStatusBar from '../common/FocusAwareStatusBar';
 import MiniPlayer from '../common/MiniPlayer';
 
-export default function index({ children }: { children: React.ReactNode }) {
+export default function index({ children, hideNav = false }: { children: React.ReactNode; hideNav?: boolean }) {
     const [activeTab, setActiveTab] = React.useState('All');
     const { onReloadHomeData, musics, recent, recommendedMusic, filteredMusic, handleLiked, handleShots, handleTopPick } = useMusic();
     const { onOpen } = useAppDrawer();
@@ -98,7 +98,7 @@ export default function index({ children }: { children: React.ReactNode }) {
     return (
         <>
             <View className='bg-white dark:bg-[#121212] flex-1'>
-                <Renderer scene={navSeen} />
+                {!hideNav && <Renderer scene={navSeen} />}
                 <FocusAwareStatusBar style='auto' />
 
                 <ScrollView
