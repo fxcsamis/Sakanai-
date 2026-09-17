@@ -3,11 +3,13 @@
 
 import AppDrawer from "@/components/common/AppDrawer";
 import CustomeTab from "@/components/common/CustomeTab";
+import { useThemePreference } from "@/components/context/themePreference";
 import TrackpanelProvider from "@/components/context/trackpanel";
 import Track from "@/components/track";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setDatabase } from "@/service/database-instance";
 import { setCurrentIndex } from "@/store/reducer/trackplayerSlice";
+import { customThemeColors } from "@/utils/constants";
 import { usePathname } from "expo-router";
 import { TabList, Tabs, TabSlot, TabTrigger } from "expo-router/ui";
 import { useSQLiteContext } from "expo-sqlite";
@@ -29,6 +31,7 @@ export default function TabLayout() {
     const [open, setOpen] = React.useState<boolean>(false);
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const { isCustomTheme } = useThemePreference();
     const track = useActiveTrack();
     const trackSlice = useAppSelector(state => state.trackReducer);
     const dispatch = useAppDispatch();
@@ -64,13 +67,9 @@ export default function TabLayout() {
                     <TabList
                         style={{
                             paddingBottom: insets.bottom,
-                            shadowColor: '#000',
-                            shadowOffset: { width: 0, height: -2 },
-                            shadowOpacity: isDark ? 0.35 : 0.1,
-                            shadowRadius: 6,
-                            elevation: 6,
+                            ...(isCustomTheme ? { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light } : null),
                         }}
-                        className={`w-full flex-row items-center justify-around px-3 py-1.5 rounded-[28px] ${isDark ? 'bg-black' : 'bg-white'}`}
+                        className={`w-full flex-row items-center justify-around px-3 py-1.5 rounded-[28px] ${isCustomTheme ? '' : isDark ? 'bg-black' : 'bg-white'}`}
                     >
                         <TabTrigger name="setting" href={'/setting'} style={{ display: 'none' }} />
                         <TabTrigger name="music library" href={'/(tabs)/music_library'} style={{ display: 'none' }} />

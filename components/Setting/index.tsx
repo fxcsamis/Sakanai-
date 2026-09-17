@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for detail
 
+import { useThemePreference } from '@/components/context/themePreference';
+import { customThemeColors } from '@/utils/constants';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Cog } from 'lucide-react-native';
 import React from 'react';
@@ -15,12 +17,14 @@ export default function index() {
     const [open, setOpen] = React.useState<boolean>(false);
     const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const { isCustomTheme } = useThemePreference();
+    const warmBg = isCustomTheme ? { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light } : undefined;
 
     const handleOpen = React.useCallback(() => setOpen(prev => !prev), []);
 
     return (
         <>
-            <View className='flex-1 bg-white dark:bg-[#121212]'>
+            <View className='flex-1 bg-white dark:bg-[#121212]' style={warmBg}>
                 <FocusAwareStatusBar style='auto' />
                 <SafeAreaView className='flex-1' edges={['top']}>
                     <View className='flex-row items-center justify-between px-5 py-3.5 border-b-[0.5px] border-slate-200 dark:border-[#282828]'>

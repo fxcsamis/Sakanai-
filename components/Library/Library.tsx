@@ -1,7 +1,9 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
+import { useThemePreference } from "@/components/context/themePreference";
 import { PlayList } from "@/types/database";
+import { customThemeColors } from "@/utils/constants";
 import { FlashList } from "@shopify/flash-list";
 import { ArrowUpDown, LayoutGrid, LayoutList, Plus } from "lucide-react-native";
 import React from "react";
@@ -23,9 +25,11 @@ export default function Library({
     const toggle = React.useCallback(() => setIsList((prev) => !prev), []);
     const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const { isCustomTheme } = useThemePreference();
+    const warmBg = isCustomTheme ? { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light } : undefined;
 
     return (
-        <View className="flex-1 bg-white dark:bg-[#121212]">
+        <View className="flex-1 bg-white dark:bg-[#121212]" style={warmBg}>
             <View className="flex-row justify-between items-center pb-4 px-1">
                 <Pressable className="flex-row items-center gap-1.5" hitSlop={8} onPress={onSort}>
                     <ArrowUpDown size={14} color={isDark ? "#B3B3B3" : "#18181B"} strokeWidth={2.5} />

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
+import { useThemePreference } from '@/components/context/themePreference';
+import { customThemeColors } from '@/utils/constants';
 import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import { Download, Search } from 'lucide-react-native';
@@ -22,6 +24,8 @@ export default function VideosScreen() {
     const insets = useSafeAreaInsets();
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const { isCustomTheme } = useThemePreference();
+    const warmBg = isCustomTheme ? { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light } : undefined;
     const { open } = useVideoPlayer();
 
     const headerHeight = insets.top + TITLE_ROW_HEIGHT + MARQUEE_ROW_HEIGHT;
@@ -54,7 +58,7 @@ export default function VideosScreen() {
     const handleOpenVideo = (video: (typeof demoVideos)[number]) => open(video);
 
     return (
-        <View className="flex-1 bg-white dark:bg-[#121212]">
+        <View className="flex-1 bg-white dark:bg-[#121212]" style={warmBg}>
             <FocusAwareStatusBar style="auto" />
 
             <FlatList

@@ -6,16 +6,18 @@ import { useColorScheme as useNativewindColorScheme } from 'nativewind';
 import React, { createContext, useContext } from 'react';
 import { Appearance } from 'react-native';
 
-export type ThemePreference = 'light' | 'dark' | 'system';
+export type ThemePreference = 'light' | 'dark' | 'system' | 'custom';
 
 const STORAGE_KEY = 'arise_theme_preference';
 
 const ThemePreferenceContext = createContext<{
     preference: ThemePreference;
     setPreference: (pref: ThemePreference) => void;
+    isCustomTheme: boolean;
 }>({
     preference: 'system',
     setPreference: () => { },
+    isCustomTheme: false,
 });
 
 export const useThemePreference = () => useContext(ThemePreferenceContext);
@@ -25,12 +27,14 @@ export default function ThemePreferenceProvider({ children }: { children: React.
     const [preference, setPreferenceState] = React.useState<ThemePreference>('system');
 
     const applyPreference = React.useCallback((pref: ThemePreference) => {
-        if (pref === 'system') {
-            Appearance.setColorScheme(null);
-            setColorScheme('system');
-        } else {
+        if (pref === 'light' || pref === 'dark') {
             Appearance.setColorScheme(pref);
             setColorScheme(pref);
+        } else {
+            // 'system' and 'custom' both follow the device's light/dark setting;
+            // 'custom' additionally swaps the app's base color palette (see customThemeColors).
+            Appearance.setColorScheme(null);
+            setColorScheme('system');
         }
     }, [setColorScheme]);
 
@@ -59,7 +63,7 @@ export default function ThemePreferenceProvider({ children }: { children: React.
     }, [applyPreference]);
 
     return (
-        <ThemePreferenceContext.Provider value={{ preference, setPreference }}>
+        <ThemePreferenceContext.Provider value={{ preference, setPreference, isCustomTheme: preference === 'custom' }}>
             {children}
         </ThemePreferenceContext.Provider>
     );

@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Raj 
 // See LICENSE for details.
+import { useThemePreference } from '@/components/context/themePreference';
 import { NavBar } from '@/config/viewRegistry/navbar';
 import { useAppDrawer } from '@/hooks/useAppDrawer';
 import { useMusic } from '@/hooks/useMusic';
@@ -7,14 +8,14 @@ import { useRefresh } from '@/hooks/useRefresh';
 import { useTrackPanle } from '@/hooks/useTrackPanel';
 import Renderer from '@/renderer/renderer';
 import { Section } from '@/types/screenMap';
-import { defaultMusicArtWork } from '@/utils/constants';
+import { customThemeColors, defaultMusicArtWork } from '@/utils/constants';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, NativeScrollEvent, NativeSyntheticEvent, RefreshControl, ScrollView, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
 import FocusAwareStatusBar from '../common/FocusAwareStatusBar';
 import MiniPlayer from '../common/MiniPlayer';
 
-export default function index({ children, hideNav = false }: { children: React.ReactNode; hideNav?: boolean }) {
+export default function index({ children, hideNav = false, onScroll }: { children: React.ReactNode; hideNav?: boolean; onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void }) {
     const [activeTab, setActiveTab] = React.useState('All');
     const { onReloadHomeData, musics, recent, recommendedMusic, filteredMusic, handleLiked, handleShots, handleTopPick } = useMusic();
     const { onOpen } = useAppDrawer();
@@ -22,6 +23,9 @@ export default function index({ children, hideNav = false }: { children: React.R
     const noMusic = musics.tracks.length === 0;
     const params = useLocalSearchParams();
     const { onOpen: openTrackPanel } = useTrackPanle();
+    const { isCustomTheme } = useThemePreference();
+    const isDark = useColorScheme() === 'dark';
+    const warmBg = isCustomTheme ? { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light } : undefined;
 
     let categories = [];
 
@@ -97,7 +101,7 @@ export default function index({ children, hideNav = false }: { children: React.R
 
     return (
         <>
-            <View className='bg-white dark:bg-[#121212] flex-1'>
+            <View className='bg-white dark:bg-[#121212] flex-1' style={warmBg}>
                 {!hideNav && <Renderer scene={navSeen} />}
                 <FocusAwareStatusBar style='auto' />
 
@@ -105,6 +109,8 @@ export default function index({ children, hideNav = false }: { children: React.R
                     contentContainerStyle={{ gap: 20, paddingBottom: 60, flexGrow: 1 }}
                     className='flex-1 px-4 py-2'
                     showsVerticalScrollIndicator={false}
+                    onScroll={onScroll}
+                    scrollEventThrottle={16}
                     refreshControl={<RefreshControl refreshing={refresh} onRefresh={handleRefresh} tintColor="#B3B3B3" />}
                 >
                     {categories.length >= 2 && <View>

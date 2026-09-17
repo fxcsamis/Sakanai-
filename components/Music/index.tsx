@@ -1,16 +1,17 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
+import { useThemePreference } from '@/components/context/themePreference';
 import { useAppDrawer } from '@/hooks/useAppDrawer';
 import { useAppSelector } from '@/hooks/useRedux';
 import HomeRenderer from '@/sections/HomeRenderer';
-import { defaultAvtar } from '@/utils/constants';
+import { customThemeColors, defaultAvtar } from '@/utils/constants';
 import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import { Cloud, CloudOff, Download, Search } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import React from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { Alert, Animated as RNAnimated, NativeScrollEvent, NativeSyntheticEvent, Pressable, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FocusAwareStatusBar from '../common/FocusAwareStatusBar';
@@ -23,6 +24,7 @@ export default function MusicScreen() {
     const { avatar, name } = useAppSelector(state => state.userReducer);
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const { isCustomTheme } = useThemePreference();
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const [mode, setMode] = React.useState<'online' | 'offline'>('offline');
@@ -31,6 +33,29 @@ export default function MusicScreen() {
     const searchIconStyle = useAnimatedStyle(() => ({
         transform: [{ scale: searchBounce.value }],
     }));
+
+    // Top bar hide-on-scroll-down / reveal-on-scroll-up — same behaviour as the Videos screen.
+    const headerHeight = insets.top + TOP_BAR_HEIGHT;
+    const translateY = React.useRef(new RNAnimated.Value(0)).current;
+    const translateYNum = React.useRef(0);
+    const lastOffset = React.useRef(0);
+
+    const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const y = e.nativeEvent.contentOffset.y;
+        const diff = y - lastOffset.current;
+        lastOffset.current = y;
+
+        if (y <= 0) {
+            translateYNum.current = 0;
+            translateY.setValue(0);
+            return;
+        }
+
+        let next = translateYNum.current - diff;
+        next = Math.max(-headerHeight, Math.min(0, next));
+        translateYNum.current = next;
+        translateY.setValue(next);
+    };
 
     const handleSearch = () => {
         searchBounce.value = withSequence(
@@ -44,35 +69,32 @@ export default function MusicScreen() {
     const handleDownload = () => Alert.alert('Downloads', 'Your downloads will show here.');
 
     const isOnline = mode === 'online';
-    const onlineBg = { backgroundColor: isDark ? '#241C18' : '#FDF0E7' };
+    const peachBg = { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light };
+    const useWarmBg = isOnline || isCustomTheme;
     const iconColor = isDark ? 'white' : 'black';
-    const headerHeight = insets.top + TOP_BAR_HEIGHT;
 
     return (
-        <View className="flex-1 bg-white dark:bg-[#121212]" style={isOnline ? onlineBg : undefined}>
+        <View className="flex-1 bg-white dark:bg-[#121212]" style={useWarmBg ? peachBg : undefined}>
             <FocusAwareStatusBar style="auto" />
 
             {/* Body — offline shows the existing Home content (its own nav hidden since we render one above);
                 online is a blank canvas for now */}
             <View style={{ flex: 1, paddingTop: headerHeight }}>
-                {isOnline ? <View className="flex-1" /> : <HomeRenderer hideNav />}
+                {isOnline ? <View className="flex-1" /> : <HomeRenderer hideNav onScroll={handleScroll} />}
             </View>
 
-            {/* Single top bar — profile + search + download + online/offline toggle — curved + blurred, used in both modes */}
-            <View
+            {/* Single top bar — profile + search + download + online/offline toggle — curved + blurred, used in both modes.
+                Slides up out of view on scroll-down and slides back in on scroll-up, matching the Videos screen. */}
+            <RNAnimated.View
                 style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     right: 0,
                     height: headerHeight,
+                    transform: [{ translateY }],
                     borderBottomLeftRadius: 24,
                     borderBottomRightRadius: 24,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: isDark ? 0.45 : 0.1,
-                    shadowRadius: 10,
-                    elevation: 8,
                 }}
             >
                 <View style={{ flex: 1, overflow: 'hidden', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
@@ -124,7 +146,7 @@ export default function MusicScreen() {
                         </View>
                     </BlurView>
                 </View>
-            </View>
+            </RNAnimated.View>
         </View>
     );
 }

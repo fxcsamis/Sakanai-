@@ -9,7 +9,7 @@ import { defaultAvtar } from '@/utils/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { Camera, Moon, Music2, Shield, Smartphone, Star, Sun, User, Webhook } from 'lucide-react-native';
+import { Camera, Moon, Music2, Palette, Shield, Smartphone, Star, Sun, User, Webhook } from 'lucide-react-native';
 import React from 'react';
 import { Image, Pressable, Switch, Text, TextInput, TouchableOpacity, View, useColorScheme } from 'react-native';
 import { useThemePreference } from '../context/themePreference';
@@ -180,6 +180,13 @@ export default function Settings({ onTerm }: { onTerm: () => void }) {
                         active={preference === 'dark'}
                         isDark={isDark}
                         onPress={() => setPreference('dark')}
+                    />
+                    <ThemeOption
+                        label="Sunset"
+                        icon={<Palette size={16} color={preference === 'custom' ? (isDark ? '#121212' : '#FFFFFF') : (isDark ? '#B3B3B3' : '#64748b')} />}
+                        active={preference === 'custom'}
+                        isDark={isDark}
+                        onPress={() => setPreference('custom')}
                     />
                 </View>
             </View>

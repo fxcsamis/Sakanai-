@@ -13,3 +13,10 @@ export const defaultPlayListCover: string =
 export const defaultPlayList = 'default'
 
 export const defaultAvtar = 'https://res.cloudinary.com/dcyn3ewpv/image/upload/v1780825511/WhatsApp_Image_2026-05-24_at_13.44.14_bfle0n.jpg'
+
+// Shared "Sunset" custom theme colors (the warm peach/brown look used across the app
+// when the user selects the custom theme from Settings > Appearance).
+export const customThemeColors = {
+  light: '#FDF0E7',
+  dark: '#241C18',
+};
