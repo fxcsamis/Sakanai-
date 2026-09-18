@@ -11,7 +11,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { Camera, Moon, Music2, Palette, Shield, Smartphone, Star, Sun, User, Webhook } from 'lucide-react-native';
 import React from 'react';
-import { Image, Pressable, Switch, Text, TextInput, TouchableOpacity, View, useColorScheme } from 'react-native';
+import { Image, Pressable, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useColorScheme } from 'nativewind';
 import { useThemePreference } from '../context/themePreference';
 import Matrics from './Matrics';
 
@@ -20,7 +21,7 @@ export default function Settings({ onTerm }: { onTerm: () => void }) {
     const { toggleWaveProgress, waveProgress } = useMusic();
     const { name: _name, avatar: _avtar } = useAppSelector(state => state.userReducer);
     const { preference, setPreference } = useThemePreference();
-    const colorScheme = useColorScheme();
+    const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
 
     const [avatar, setAvatarLocal] = React.useState<string | null>(null);

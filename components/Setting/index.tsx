@@ -6,7 +6,8 @@ import { customThemeColors } from '@/utils/constants';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Cog } from 'lucide-react-native';
 import React from 'react';
-import { Pressable, ScrollView, Text, View, useColorScheme } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FocusAwareStatusBar from '../common/FocusAwareStatusBar';
 import TermAndConditionSheet from '../common/TermAndConditionSheet';
@@ -15,7 +16,7 @@ import Settings from './Settings';
 export default function index() {
     const router = useRouter();
     const [open, setOpen] = React.useState<boolean>(false);
-    const colorScheme = useColorScheme();
+    const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
     const { isCustomTheme } = useThemePreference();
     const warmBg = isCustomTheme ? { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light } : undefined;

@@ -7,7 +7,8 @@ import { customThemeColors } from "@/utils/constants";
 import { FlashList } from "@shopify/flash-list";
 import { ArrowUpDown, LayoutGrid, LayoutList, Plus } from "lucide-react-native";
 import React from "react";
-import { Pressable, Text, View, useColorScheme } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { useColorScheme } from "nativewind";
 import LibraryCard from "./LibraryCard";
 
 export default function Library({
@@ -23,7 +24,7 @@ export default function Library({
 }) {
     const [isList, setIsList] = React.useState(false);
     const toggle = React.useCallback(() => setIsList((prev) => !prev), []);
-    const colorScheme = useColorScheme();
+    const colorScheme = useColorScheme().colorScheme;
     const isDark = colorScheme === 'dark';
     const { isCustomTheme } = useThemePreference();
     const warmBg = isCustomTheme ? { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light } : undefined;

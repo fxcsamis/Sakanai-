@@ -11,7 +11,8 @@ import { Section } from '@/types/screenMap';
 import { customThemeColors, defaultMusicArtWork } from '@/utils/constants';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { Image, NativeScrollEvent, NativeSyntheticEvent, RefreshControl, ScrollView, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
+import { Image, NativeScrollEvent, NativeSyntheticEvent, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useColorScheme } from 'nativewind';
 import FocusAwareStatusBar from '../common/FocusAwareStatusBar';
 import MiniPlayer from '../common/MiniPlayer';
 
@@ -24,7 +25,7 @@ export default function index({ children, hideNav = false, onScroll }: { childre
     const params = useLocalSearchParams();
     const { onOpen: openTrackPanel } = useTrackPanle();
     const { isCustomTheme } = useThemePreference();
-    const isDark = useColorScheme() === 'dark';
+    const isDark = useColorScheme().colorScheme === 'dark';
     const warmBg = isCustomTheme ? { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light } : undefined;
 
     let categories = [];
