@@ -5,9 +5,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from "expo-font";
 import { Stack } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import * as NavigationBar from 'expo-navigation-bar';
 
 import AppThemeProvider from '@/components/context/apptheme';
 import MusicContextProvider from '@/components/context/music';
@@ -37,16 +35,6 @@ export default function Layout() {
     OldStandT_700: require('@/assets/font/OldStandardTT-Bold.ttf'),
   });
   const { colorScheme } = useColorScheme();
-
-  // Make Android's system navigation bar fully transparent so our floating rounded
-  // tab bar isn't drawn on top of the OS's default gray nav-bar scrim (the leftover
-  // "shadow" behind the pill was this system bar, not anything in our own styles).
-  React.useEffect(() => {
-    if (Platform.OS !== 'android') return;
-    NavigationBar.setPositionAsync('absolute').catch(() => { });
-    NavigationBar.setBackgroundColorAsync('#00000000').catch(() => { });
-    NavigationBar.setButtonStyleAsync(colorScheme === 'dark' ? 'light' : 'dark').catch(() => { });
-  }, [colorScheme]);
 
   if (!fontsLoaded || !isReady) return null;
 
