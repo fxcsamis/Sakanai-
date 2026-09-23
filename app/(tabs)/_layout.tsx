@@ -37,6 +37,20 @@ export default function TabLayout() {
     const dispatch = useAppDispatch();
     const pathname = usePathname();
 
+    // Same background the screens use, so the gap around the floating bar blends in (no black strip)
+    const pageBg = isCustomTheme
+        ? (isDark ? customThemeColors.dark : customThemeColors.light)
+        : (isDark ? '#121212' : '#FFFFFF');
+
+    // Floating pill colours: slightly different from the page so the capsule stays visible
+    const pill = isCustomTheme
+        ? (isDark
+            ? { bg: '#33261F' }
+            : { bg: '#F8E3D3' })
+        : (isDark
+            ? { bg: '#1E1E1E' }
+            : { bg: '#F1F1F3' });
+
     const handleClose = () => setOpen(false);
     const handleOpen = () => setOpen(true);
 
@@ -59,18 +73,20 @@ export default function TabLayout() {
     return (
         <>
             <TrackpanelProvider>
-                <Tabs>
+                <Tabs style={{ flex: 1, backgroundColor: pageBg }}>
                     <AppDrawerContext.Provider value={{ open, onClose: handleClose, onOpen: handleOpen }}>
                         <TabSlot />
                     </AppDrawerContext.Provider>
 
                     <TabList
                         style={{
-                            paddingBottom: insets.bottom,
+                            marginHorizontal: 16,
+                            marginTop: 6,
+                            marginBottom: Math.max(insets.bottom, 10),
+                            backgroundColor: pill.bg,
                             overflow: 'hidden',
-                            ...(isCustomTheme ? { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light } : null),
                         }}
-                        className={`w-full flex-row items-center justify-around px-3 py-1.5 rounded-[28px] ${isCustomTheme ? '' : isDark ? 'bg-black' : 'bg-white'}`}
+                        className='flex-row items-center justify-around px-3 py-1.5 rounded-[28px]'
                     >
                         <TabTrigger name="setting" href={'/setting'} style={{ display: 'none' }} />
                         <TabTrigger name="music library" href={'/(tabs)/music_library'} style={{ display: 'none' }} />
