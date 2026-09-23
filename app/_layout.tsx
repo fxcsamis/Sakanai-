@@ -1,74 +1,120 @@
 // Copyright (c) 2026 Raj 
 // See LICENSE for details.
 
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from "expo-font";
-import { Stack } from 'expo-router';
-import React from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AppDrawer from "@/components/common/AppDrawer";
+import CustomeTab from "@/components/common/CustomeTab";
+import { useThemePreference } from "@/components/context/themePreference";
+import TrackpanelProvider from "@/components/context/trackpanel";
+import Track from "@/components/track";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { setDatabase } from "@/service/database-instance";
+import { setCurrentIndex } from "@/store/reducer/trackplayerSlice";
+import { customThemeColors } from "@/utils/constants";
+import { usePathname } from "expo-router";
+import { TabList, Tabs, TabSlot, TabTrigger } from "expo-router/ui";
+import { useSQLiteContext } from "expo-sqlite";
+import { Home, Library, Video } from "lucide-react-native";
+import { useColorScheme } from "nativewind";
+import React from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useActiveTrack } from "react-native-track-player";
 
-import AppThemeProvider from '@/components/context/apptheme';
-import MusicContextProvider from '@/components/context/music';
-import RefreshProvider from '@/components/context/refresh';
-import ThemePreferenceProvider from '@/components/context/themePreference';
-import VideoPlayerProvider from '@/components/context/videoplayer';
-import ErrorBoundary from '@/components/common/ErrorBoundary';
-import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
-import VideoPlayerOverlay from '@/components/VideoDetail/VideoPlayerOverlay';
-import '@/global.css';
-import { useSetupPlayer } from '@/hooks/useSetupPlayer';
-import { InitiateDataBase } from '@/service/database';
-import { store } from '@/store/store';
-import { SQLiteProvider } from 'expo-sqlite';
-import { useColorScheme } from 'nativewind';
-import { Provider } from 'react-redux';
+export const AppDrawerContext = React.createContext({
+    open: false,
+    onClose: () => { },
+    onOpen: () => { }
+});
 
+export default function TabLayout() {
+    const db = useSQLiteContext();
+    const insets = useSafeAreaInsets();
+    const [open, setOpen] = React.useState<boolean>(false);
+    const { colorScheme } = useColorScheme();
+    const isDark = colorScheme === 'dark';
+    const { isCustomTheme } = useThemePreference();
+    const track = useActiveTrack();
+    const trackSlice = useAppSelector(state => state.trackReducer);
+    const dispatch = useAppDispatch();
+    const pathname = usePathname();
 
-export default function Layout() {
-  const isReady = useSetupPlayer();
-  const [fontsLoaded] = useFonts({
-    ElmsSans_400: require('@/assets/font/ElmsSans-Regular.ttf'),
-    ElmsSans_500: require('@/assets/font/ElmsSans-Medium.ttf'),
-    ElmsSans_700: require('@/assets/font/ElmsSans-Bold.ttf'),
+    // Same background the screens use, so the gap around the floating bar blends in (no black strip)
+    const pageBg = isCustomTheme
+        ? (isDark ? customThemeColors.dark : customThemeColors.light)
+        : (isDark ? '#121212' : '#FFFFFF');
 
-    OldStandT_400: require('@/assets/font/OldStandardTT-Regular.ttf'),
-    OldStandT_700: require('@/assets/font/OldStandardTT-Bold.ttf'),
-  });
-  const { colorScheme } = useColorScheme();
+    // Floating pill colours: slightly different from the page so the capsule stays visible
+    const pill = isCustomTheme
+        ? (isDark
+            ? { bg: '#33261F', border: 'rgba(255,255,255,0.08)' }
+            : { bg: '#F8E3D3', border: 'rgba(0,0,0,0.06)' })
+        : (isDark
+            ? { bg: '#1E1E1E', border: 'rgba(255,255,255,0.08)' }
+            : { bg: '#F1F1F3', border: 'rgba(0,0,0,0.06)' });
 
-  if (!fontsLoaded || !isReady) return null;
+    const handleClose = () => setOpen(false);
+    const handleOpen = () => setOpen(true);
 
-  return (
+    React.useEffect(() => {
+        if (!track) return;
 
-    <ErrorBoundary>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Provider store={store}>
-          <ThemePreferenceProvider>
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <SQLiteProvider databaseName='arise_raj_sqlite.db' onInit={InitiateDataBase}>
-                <AppThemeProvider colorTheme={colorScheme}>
-                  <MusicContextProvider>
-                    <RefreshProvider>
-                      <VideoPlayerProvider>
-                        <GluestackUIProvider mode={colorScheme ?? "light"} style={{ flex: 1 }}>
-                          <Stack screenOptions={{ headerShown: false }} >
-                            <Stack.Screen name='index' />
-                            <Stack.Screen name='(tabs)' />
-                            <Stack.Screen name='video-search' options={{ animation: 'slide_from_right' }} />
-                            <Stack.Screen name='music-search' options={{ animation: 'fade', animationDuration: 150 }} />
-                            <Stack.Screen name='music-setting' options={{ animation: 'slide_from_right' }} />
-                          </Stack>
-                          <VideoPlayerOverlay />
-                        </GluestackUIProvider>
-                      </VideoPlayerProvider>
-                    </RefreshProvider>
-                  </MusicContextProvider>
-                </AppThemeProvider>
-              </SQLiteProvider>
-            </ThemeProvider>
-          </ThemePreferenceProvider>
-        </Provider>
-      </GestureHandlerRootView>
-    </ErrorBoundary>
-  );
+        const queue = trackSlice.queue;
+        const idx = queue.findIndex(item => item.musicId === track.mediaId);
+        if (typeof idx === 'undefined' || typeof idx === null || idx === -1) return;
+
+        if (idx === trackSlice.currentIndex) return;
+        dispatch(setCurrentIndex(idx));
+
+    }, [track]);
+
+    React.useEffect(() => {
+        setDatabase(db);
+    }, [db]);
+
+    return (
+        <>
+            <TrackpanelProvider>
+                <Tabs style={{ flex: 1, backgroundColor: pageBg }}>
+                    <AppDrawerContext.Provider value={{ open, onClose: handleClose, onOpen: handleOpen }}>
+                        <TabSlot />
+                    </AppDrawerContext.Provider>
+
+                    <TabList
+                        style={{
+                            marginHorizontal: 16,
+                            marginTop: 6,
+                            marginBottom: Math.max(insets.bottom, 10),
+                            backgroundColor: pill.bg,
+                            borderColor: pill.border,
+                            borderWidth: 1,
+                            borderRadius: 999,
+                            overflow: 'hidden',
+                        }}
+                        className='flex-row items-center justify-around px-2 py-1.5'
+                    >
+                        <TabTrigger name="setting" href={'/setting'} style={{ display: 'none' }} />
+                        <TabTrigger name="music library" href={'/(tabs)/music_library'} style={{ display: 'none' }} />
+                        <TabTrigger name="Search" href={"/search"} style={{ display: 'none' }} />
+                        {/* <TabTrigger name="playlist" href={'/(tabs)/playlist'} style={{ display: 'none' }} /> */}
+                        <TabTrigger name="index" href={"/home"}>
+                            <CustomeTab name="Music" Icon={Home} isActive={pathname.startsWith('/home')} />
+                        </TabTrigger>
+
+                        <TabTrigger name="Videos" href={"/videos"}>
+                            <CustomeTab name="Videos" Icon={Video} isActive={pathname.startsWith('/videos')} />
+                        </TabTrigger>
+
+                        <TabTrigger name="Vibes" href={"/shorts"}>
+                            <CustomeTab name="Shorts" image={isDark ? require('@/assets/arise/shorts-dark.png') : require('@/assets/arise/shorts.png')} isActive={pathname.startsWith('/shorts')} />
+                        </TabTrigger>
+
+                        <TabTrigger name="Library" href={"/library"}>
+                            <CustomeTab name="Library" Icon={Library} isActive={pathname.startsWith('/library')} />
+                        </TabTrigger>
+                    </TabList>
+                </Tabs>
+                <AppDrawer onClose={handleClose} open={open} />
+                <Track />
+            </TrackpanelProvider>
+        </>
+    );
 }
