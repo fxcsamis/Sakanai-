@@ -3,6 +3,7 @@
 
 import AppDrawer from "@/components/common/AppDrawer";
 import CustomeTab from "@/components/common/CustomeTab";
+import TabBarBackground, { BAR_H, BAR_MARGIN, BAR_PAD } from "@/components/common/TabBarBackground";
 import { useThemePreference } from "@/components/context/themePreference";
 import TrackpanelProvider from "@/components/context/trackpanel";
 import Track from "@/components/track";
@@ -37,6 +38,15 @@ export default function TabLayout() {
     const dispatch = useAppDispatch();
     const pathname = usePathname();
 
+    // Which visible tab is active (-1 for hidden routes like settings / search)
+    const tabIndex = pathname.startsWith('/home') ? 0
+        : pathname.startsWith('/videos') ? 1
+        : pathname.startsWith('/shorts') ? 2
+        : pathname.startsWith('/library') ? 3
+        : -1;
+    const barBottom = Math.max(insets.bottom, 10);
+    const tabTriggerStyle = { flex: 1, alignItems: 'center' as const, justifyContent: 'center' as const };
+
     // Same background the screens use, so the gap around the floating bar blends in (no black strip)
     const pageBg = isDark ? '#121212' : '#FFFFFF';
 
@@ -70,35 +80,37 @@ export default function TabLayout() {
                         <TabSlot />
                     </AppDrawerContext.Provider>
 
+                    <TabBarBackground activeIndex={tabIndex} isDark={isDark} bottom={barBottom} />
+
                     <TabList
                         style={{
                             position: 'absolute',
-                            left: 16,
-                            right: 16,
-                            bottom: Math.max(insets.bottom, 10),
-                            backgroundColor: pill.bg,
-                            overflow: 'hidden',
+                            left: BAR_MARGIN,
+                            right: BAR_MARGIN,
+                            bottom: barBottom,
+                            height: BAR_H,
+                            padding: BAR_PAD,
+                            flexDirection: 'row',
+                            alignItems: 'center',
                         }}
-                        className='flex-row items-center justify-around px-3 py-1.5 rounded-[28px]'
                     >
                         <TabTrigger name="setting" href={'/setting'} style={{ display: 'none' }} />
                         <TabTrigger name="music library" href={'/(tabs)/music_library'} style={{ display: 'none' }} />
                         <TabTrigger name="Search" href={"/search"} style={{ display: 'none' }} />
-                        {/* <TabTrigger name="playlist" href={'/(tabs)/playlist'} style={{ display: 'none' }} /> */}
-                        <TabTrigger name="index" href={"/home"}>
-                            <CustomeTab name="Music" Icon={Home} isActive={pathname.startsWith('/home')} />
+                        <TabTrigger name="index" href={"/home"} style={tabTriggerStyle}>
+                            <CustomeTab name="Music" Icon={Home} isActive={tabIndex === 0} />
                         </TabTrigger>
 
-                        <TabTrigger name="Videos" href={"/videos"}>
-                            <CustomeTab name="Videos" Icon={Video} isActive={pathname.startsWith('/videos')} />
+                        <TabTrigger name="Videos" href={"/videos"} style={tabTriggerStyle}>
+                            <CustomeTab name="Videos" Icon={Video} isActive={tabIndex === 1} />
                         </TabTrigger>
 
-                        <TabTrigger name="Vibes" href={"/shorts"}>
-                            <CustomeTab name="Shorts" image={isDark ? require('@/assets/arise/shorts-dark.png') : require('@/assets/arise/shorts.png')} isActive={pathname.startsWith('/shorts')} />
+                        <TabTrigger name="Vibes" href={"/shorts"} style={tabTriggerStyle}>
+                            <CustomeTab name="Shorts" image={isDark ? require('@/assets/arise/shorts-dark.png') : require('@/assets/arise/shorts.png')} isActive={tabIndex === 2} />
                         </TabTrigger>
 
-                        <TabTrigger name="Library" href={"/library"}>
-                            <CustomeTab name="Library" Icon={Library} isActive={pathname.startsWith('/library')} />
+                        <TabTrigger name="Library" href={"/library"} style={tabTriggerStyle}>
+                            <CustomeTab name="Library" Icon={Library} isActive={tabIndex === 3} />
                         </TabTrigger>
                     </TabList>
                 </Tabs>
