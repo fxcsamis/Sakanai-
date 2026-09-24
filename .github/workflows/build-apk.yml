@@ -35,12 +35,16 @@ jobs:
       - name: Prebuild native android project
         run: npx expo prebuild --platform android --clean
 
-      - name: Increase Gradle memory (fixes OutOfMemoryError during packaging)
-        run: echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
+      - name: Increase Gradle memory (fixes Java heap space)
+        run: |
+          echo "org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g" >> android/gradle.properties
+          echo "kotlin.daemon.jvmargs=-Xmx3g" >> android/gradle.properties
+          echo "org.gradle.workers.max=2" >> android/gradle.properties
+          echo "org.gradle.parallel=false" >> android/gradle.properties
 
-      - name: Build release APK (standalone, no dev server needed)
+      - name: Build release APK (arm64 only, standalone)
         working-directory: android
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
