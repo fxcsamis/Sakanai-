@@ -52,7 +52,7 @@ export default function VideosScreen() {
         translateY.setValue(next);
     };
 
-    const handleSearch = () => router.push('/video-search');
+    const handleSearch = () => router.push({ pathname: '/music-search', params: { mode: 'video' } });
 
     const handleDownload = () => Alert.alert('Download', 'Downloads will be available soon.');
 
