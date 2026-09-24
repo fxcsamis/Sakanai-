@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { useMusic } from '@/hooks/useMusic';
 import { useTrack } from '@/hooks/useTrack';
 import { getTrackFromMusic } from '@/service/TrackMaker';
@@ -61,7 +62,7 @@ export default function OnlineHome() {
             style={{ backgroundColor: CREAM }}
             className="dark:bg-[#241C18]"
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 40 }}
+            contentContainerStyle={{ paddingBottom: TAB_BAR_SPACE + 72 }}
         >
             <View className="px-5 pt-4">
                 <Text style={{ color: MAROON }} className="text-6xl font-elms-med leading-[3.4rem] dark:text-[#F3D9CC]">

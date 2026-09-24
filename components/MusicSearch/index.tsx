@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Mic, Search as SearchIcon, X } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
@@ -73,7 +74,7 @@ export default function MusicSearchScreen() {
                 </Animated.View>
             </SafeAreaView>
 
-            <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 40 }}>
+            <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: TAB_BAR_SPACE + 12 }}>
                 <Text style={{ color: isDark ? '#F3D9CC99' : '#7A3B2E99' }} className="text-[14px]">
                     {query.trim().length > 0
                         ? `No local results for "${query}" yet.`

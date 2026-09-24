@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj 
 // See LICENSE for details.
 
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { useAppSelector } from '@/hooks/useRedux';
 import { useShorts } from '@/hooks/useShorts';
 import { AriseTrack } from '@/types/database';
@@ -29,7 +30,7 @@ export default function FeedOverLay({ like, onLike, animation, feed, toggleImage
 
     return (
         <>
-            <Animated.View style={wrapperStyle} className='absolute z-10 inset-0 justify-end pb-6 px-4' pointerEvents="box-none">
+            <Animated.View style={[wrapperStyle, { paddingBottom: TAB_BAR_SPACE + 8 }]} className='absolute z-10 inset-0 justify-end px-4' pointerEvents="box-none">
                 <View className='flex-row items-end justify-between w-full' pointerEvents="box-none">
 
                     <View className='flex-1 mr-6 gap-3' pointerEvents="box-none">

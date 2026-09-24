@@ -20,3 +20,6 @@ export const customThemeColors = {
   light: '#FDF0E7',
   dark: '#241C18',
 };
+
+// Space the floating bottom tab bar takes (bar + gap). Screens add it as bottom padding.
+export const TAB_BAR_SPACE = 84;

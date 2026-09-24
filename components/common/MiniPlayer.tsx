@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { useAppSelector } from '@/hooks/useRedux';
 import { useTrack } from '@/hooks/useTrack';
 import { useTrackPanle } from '@/hooks/useTrackPanel';
@@ -145,7 +146,7 @@ export default function MiniPlayer() {
 
     return (
         <>
-            <Pressable onPress={onOpen} className='absolute h-16 mx-1 left-0 right-0 bottom-0 rounded-lg overflow-hidden'>
+            <Pressable onPress={onOpen} style={{ bottom: TAB_BAR_SPACE }} className='absolute h-16 mx-1 left-0 right-0 rounded-lg overflow-hidden'>
                 <LinearGradient
                     colors={gradient}
                     start={{ x: 0, y: 0 }}

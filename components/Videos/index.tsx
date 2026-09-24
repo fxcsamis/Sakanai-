@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { useThemePreference } from '@/components/context/themePreference';
 import { customThemeColors } from '@/utils/constants';
 import { BlurView } from 'expo-blur';
@@ -67,7 +68,7 @@ export default function VideosScreen() {
                 showsVerticalScrollIndicator={false}
                 scrollEventThrottle={16}
                 onScroll={handleScroll}
-                contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: 90 }}
+                contentContainerStyle={{ paddingTop: headerHeight + 8, paddingBottom: TAB_BAR_SPACE + 12 }}
                 renderItem={({ item }) => <VideoCard video={item} onPress={handleOpenVideo} />}
             />
 

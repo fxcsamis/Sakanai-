@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Music2, Palette, PlayCircle, Video } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
@@ -33,7 +34,7 @@ export default function MusicSettingScreen() {
                 </View>
             </SafeAreaView>
 
-            <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}>
+            <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: TAB_BAR_SPACE + 12 }}>
                 <Text className="text-xs font-bold text-slate-400 dark:text-[#A1A1AA] uppercase tracking-wider mb-2">
                     Appearance
                 </Text>

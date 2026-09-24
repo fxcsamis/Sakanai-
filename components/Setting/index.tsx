@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for detail
 
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { useThemePreference } from '@/components/context/themePreference';
 import { customThemeColors } from '@/utils/constants';
 import { useRouter } from 'expo-router';
@@ -37,7 +38,7 @@ export default function index() {
                             <Cog size={18} color={isDark ? '#FFFFFF' : '#64748B'} />
                         </Pressable>
                     </View>
-                    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20, paddingBottom: 60 }} className='flex-1 px-4 py-2 '>
+                    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20, paddingBottom: TAB_BAR_SPACE + 12 }} className='flex-1 px-4 py-2 '>
 
 
                         <Settings onTerm={handleOpen} />

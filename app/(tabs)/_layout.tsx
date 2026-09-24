@@ -80,9 +80,10 @@ export default function TabLayout() {
 
                     <TabList
                         style={{
-                            marginHorizontal: 16,
-                            marginTop: 6,
-                            marginBottom: Math.max(insets.bottom, 10),
+                            position: 'absolute',
+                            left: 16,
+                            right: 16,
+                            bottom: Math.max(insets.bottom, 10),
                             backgroundColor: pill.bg,
                             overflow: 'hidden',
                         }}

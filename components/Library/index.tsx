@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for details.
 
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { useThemePreference } from "@/components/context/themePreference";
 import { NavBar } from "@/config/viewRegistry/navbar";
 import { useRefresh } from "@/hooks/useRefresh";
@@ -70,7 +71,7 @@ export default function index() {
                 <FocusAwareStatusBar style="auto" />
                 <Renderer scene={navSeen} />
                 <ScrollView
-                    contentContainerStyle={{ gap: 20, paddingBottom: 10 }}
+                    contentContainerStyle={{ gap: 20, paddingBottom: TAB_BAR_SPACE + 72 }}
                     className="flex-1 px-6 py-2"
                     showsVerticalScrollIndicator={false}
                     refreshControl={

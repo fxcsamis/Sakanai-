@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj
 // See LICENSE for detail
 
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { useMusic } from '@/hooks/useMusic';
 import { useShorts } from '@/hooks/useShorts';
 import { useTrack } from '@/hooks/useTrack';
@@ -294,7 +295,7 @@ function FeedItem({ containerHeight, isActive, feed }: { containerHeight: number
                 <View
                     style={{
                         position: 'absolute',
-                        bottom: -5,
+                        bottom: TAB_BAR_SPACE - 5,
                         left: 0, right: 0,
                         zIndex: 50,
                         paddingBottom: 6,

@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Raj 
 // See LICENSE for details.
 
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { NavBar } from '@/config/viewRegistry/navbar';
 import { useMusic } from '@/hooks/useMusic';
 import { useRefresh } from '@/hooks/useRefresh';
@@ -57,7 +58,7 @@ export default function index({ children }: { children: React.ReactNode }) {
         <View className='flex-1 bg-white dark:bg-[#121212]'>
             <FocusAwareStatusBar style='auto' />
             <Renderer scene={navSeen} />
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20, paddingBottom: 10 }} className='flex-1 px-4 py-2'
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 20, paddingBottom: TAB_BAR_SPACE + 12 }} className='flex-1 px-4 py-2'
                 refreshControl={<RefreshControl refreshing={refresh} onRefresh={handleRefresh} tintColor="#B3B3B3" />}>
                 <SearchInput _query={query} musicList={musics} />
                 <SuggestGrids onRecent={handleRecentMusic} onLiked={handleLikedMusic} onSuggested={handleSuggested} onTopPick={handleTopPick} />

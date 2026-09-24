@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Raj 
 // See LICENSE for details.
+import { TAB_BAR_SPACE } from '@/utils/constants';
 import { useThemePreference } from '@/components/context/themePreference';
 import { NavBar } from '@/config/viewRegistry/navbar';
 import { useAppDrawer } from '@/hooks/useAppDrawer';
@@ -107,7 +108,7 @@ export default function index({ children, hideNav = false, onScroll }: { childre
                 <FocusAwareStatusBar style='auto' />
 
                 <ScrollView
-                    contentContainerStyle={{ gap: 20, paddingBottom: 60, flexGrow: 1 }}
+                    contentContainerStyle={{ gap: 20, paddingBottom: TAB_BAR_SPACE + 72, flexGrow: 1 }}
                     className='flex-1 px-4 py-2'
                     showsVerticalScrollIndicator={false}
                     onScroll={onScroll}
