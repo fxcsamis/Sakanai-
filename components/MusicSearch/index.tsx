@@ -11,7 +11,7 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withSpring, withTim
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FocusAwareStatusBar from '../common/FocusAwareStatusBar';
 
-const CREAM = '#FDF0E7';
+const CREAM = '#FFFFFF';
 const MAROON = '#7A3B2E';
 
 export default function MusicSearchScreen() {
@@ -34,7 +34,7 @@ export default function MusicSearchScreen() {
     }));
 
     return (
-        <View style={{ flex: 1, backgroundColor: isDark ? '#241C18' : CREAM }}>
+        <View style={{ flex: 1, backgroundColor: isDark ? '#121212' : CREAM }}>
             <FocusAwareStatusBar style="auto" />
 
             <SafeAreaView edges={['top']}>

@@ -38,18 +38,10 @@ export default function TabLayout() {
     const pathname = usePathname();
 
     // Same background the screens use, so the gap around the floating bar blends in (no black strip)
-    const pageBg = isCustomTheme
-        ? (isDark ? customThemeColors.dark : customThemeColors.light)
-        : (isDark ? '#121212' : '#FFFFFF');
+    const pageBg = isDark ? '#121212' : '#FFFFFF';
 
     // Floating pill colours: slightly different from the page so the capsule stays visible
-    const pill = isCustomTheme
-        ? (isDark
-            ? { bg: '#33261F' }
-            : { bg: '#F8E3D3' })
-        : (isDark
-            ? { bg: '#1E1E1E' }
-            : { bg: '#F1F1F3' });
+    const pill = isDark ? { bg: '#1E1E1E' } : { bg: '#F1F1F3' };
 
     const handleClose = () => setOpen(false);
     const handleOpen = () => setOpen(true);

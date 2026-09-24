@@ -6,7 +6,7 @@ import { useColorScheme as useNativewindColorScheme } from 'nativewind';
 import React, { createContext, useContext } from 'react';
 import { Appearance } from 'react-native';
 
-export type ThemePreference = 'light' | 'dark' | 'system' | 'custom';
+export type ThemePreference = 'light' | 'dark' | 'system';
 
 const STORAGE_KEY = 'arise_theme_preference';
 
@@ -42,7 +42,7 @@ export default function ThemePreferenceProvider({ children }: { children: React.
         (async () => {
             try {
                 const saved = await AsyncStorage.getItem(STORAGE_KEY);
-                const pref = (saved as ThemePreference | null) ?? 'system';
+                const pref: ThemePreference = saved === 'light' || saved === 'dark' ? saved : 'system';
                 setPreferenceState(pref);
                 applyPreference(pref);
             } catch (error) {
@@ -63,7 +63,7 @@ export default function ThemePreferenceProvider({ children }: { children: React.
     }, [applyPreference]);
 
     return (
-        <ThemePreferenceContext.Provider value={{ preference, setPreference, isCustomTheme: preference === 'custom' }}>
+        <ThemePreferenceContext.Provider value={{ preference, setPreference, isCustomTheme: false }}>
             {children}
         </ThemePreferenceContext.Provider>
     );

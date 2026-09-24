@@ -11,8 +11,8 @@ import { Play } from 'lucide-react-native';
 import React from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 
-const CREAM = '#FDF0E7';
-const CREAM_DARK = '#241C18';
+const CREAM = '#FFFFFF';
+const CREAM_DARK = '#121212';
 const MAROON = '#7A3B2E';
 const CORAL = '#FF6F4E';
 
@@ -60,7 +60,7 @@ export default function OnlineHome() {
     return (
         <ScrollView
             style={{ backgroundColor: CREAM }}
-            className="dark:bg-[#241C18]"
+            className="dark:bg-[#121212]"
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: TAB_BAR_SPACE + 72 }}
         >

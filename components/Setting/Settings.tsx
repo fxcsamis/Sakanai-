@@ -182,13 +182,6 @@ export default function Settings({ onTerm }: { onTerm: () => void }) {
                         isDark={isDark}
                         onPress={() => setPreference('dark')}
                     />
-                    <ThemeOption
-                        label="Sunset"
-                        icon={<Palette size={16} color={preference === 'custom' ? (isDark ? '#121212' : '#FFFFFF') : (isDark ? '#B3B3B3' : '#64748b')} />}
-                        active={preference === 'custom'}
-                        isDark={isDark}
-                        onPress={() => setPreference('custom')}
-                    />
                 </View>
             </View>
 

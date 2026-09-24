@@ -72,7 +72,7 @@ export default function MusicScreen() {
 
     const isOnline = mode === 'online';
     const peachBg = { backgroundColor: isDark ? customThemeColors.dark : customThemeColors.light };
-    const useWarmBg = isOnline || isCustomTheme;
+    const useWarmBg = false; // Sunset theme removed
     const iconColor = isDark ? 'white' : 'black';
     const barBg = useWarmBg ? (isDark ? customThemeColors.dark : customThemeColors.light) : (isDark ? '#121212' : '#FFFFFF');
 
