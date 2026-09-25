@@ -14,7 +14,7 @@ import { customThemeColors } from "@/utils/constants";
 import { usePathname } from "expo-router";
 import { TabList, Tabs, TabSlot, TabTrigger } from "expo-router/ui";
 import { useSQLiteContext } from "expo-sqlite";
-import { Home, Library, Video } from "lucide-react-native";
+import { Download, Globe, Home, Library, Video } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
 import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -41,8 +41,8 @@ export default function TabLayout() {
     // Which visible tab is active (-1 for hidden routes like settings / search)
     const tabIndex = pathname.startsWith('/home') ? 0
         : pathname.startsWith('/videos') ? 1
-        : pathname.startsWith('/shorts') ? 2
-        : pathname.startsWith('/library') ? 3
+        : pathname.startsWith('/downloader-hub') ? 2
+        : pathname.startsWith('/browser-hub') ? 3
         : -1;
     const barBottom = Math.max(insets.bottom, 10);
     const tabTriggerStyle = { flex: 1, alignItems: 'center' as const, justifyContent: 'center' as const };
@@ -105,12 +105,16 @@ export default function TabLayout() {
                             <CustomeTab name="Videos" Icon={Video} isActive={tabIndex === 1} />
                         </TabTrigger>
 
-                        <TabTrigger name="Vibes" href={"/shorts"} style={tabTriggerStyle}>
-                            <CustomeTab name="Shorts" image={isDark ? require('@/assets/arise/shorts-dark.png') : require('@/assets/arise/shorts.png')} isActive={tabIndex === 2} />
+                        <TabTrigger name="Vibes" href={"/shorts"} style={{ display: 'none' }} />
+
+                        <TabTrigger name="Downloader Hub" href={"/downloader-hub"} style={tabTriggerStyle}>
+                            <CustomeTab name="Downloads" Icon={Download} isActive={tabIndex === 2} />
                         </TabTrigger>
 
-                        <TabTrigger name="Library" href={"/library"} style={tabTriggerStyle}>
-                            <CustomeTab name="Library" Icon={Library} isActive={tabIndex === 3} />
+                        <TabTrigger name="Library" href={"/library"} style={{ display: 'none' }} />
+
+                        <TabTrigger name="Browser Hub" href={"/browser-hub"} style={tabTriggerStyle}>
+                            <CustomeTab name="Browser" Icon={Globe} isActive={tabIndex === 3} />
                         </TabTrigger>
                     </TabList>
                 </Tabs>

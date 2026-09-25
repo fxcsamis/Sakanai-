@@ -8,11 +8,10 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 
 const TOPICS = ['🔥 Trending videos', '⚡ Viral videos', '🎬 Movies', '🎵 Music videos', '📺 Live streams'];
 
-// Reserve space on the left of the scroll row for the pinned Shorts + Live chips,
-// so trending pills start scrolling from behind them. Wider than before so nothing
-// peeks out on either side, plus room for the smoke-fade strip at the boundary.
-const FIXED_W = 178;
-const FADE_W = 26;
+// Reserve just enough space on the left for the pinned Shorts + Live badges (sized to
+// them, not a wide guess), plus a slim smoke-fade strip where scrolling pills reappear.
+const FIXED_W = 110;
+const FADE_W = 14;
 
 function Pill({ text, isDark }: { text: string; isDark: boolean }) {
     return (
@@ -70,7 +69,7 @@ export default function VideoTopicsMarquee({ isDark, backgroundColor }: { isDark
                 }}
             >
                 {/* Opens the real Shorts feed */}
-                <Pressable onPress={() => router.push('/shorts')} hitSlop={4} style={{ marginRight: 10 }}>
+                <Pressable onPress={() => router.push('/shorts')} hitSlop={4} style={{ marginRight: 16 }}>
                     <Image
                         source={require('@/assets/arise/shorts-badge.png')}
                         style={{ width: 22, height: 17 }}
