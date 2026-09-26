@@ -12,7 +12,6 @@ import Animated, {
     Easing, useAnimatedStyle, useSharedValue, withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import { Link } from 'expo-router';
 import { Avatar, AvatarFallbackText, AvatarImage } from '../ui/avatar';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
