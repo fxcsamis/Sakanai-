@@ -4,7 +4,7 @@
 import { useAppSelector } from '@/hooks/useRedux';
 import { defaultAvtar } from '@/utils/constants';
 import { Link } from 'expo-router';
-import { Home, Library, Music, Music2, Search, Settings } from 'lucide-react-native';
+import { ChevronRight, Home, Library, Music, Music2, Search, Settings } from 'lucide-react-native';
 import React, { useEffect } from 'react';
 import { Dimensions, Pressable, ScrollView, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -12,6 +12,7 @@ import Animated, {
     Easing, useAnimatedStyle, useSharedValue, withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
+import { Link } from 'expo-router';
 import { Avatar, AvatarFallbackText, AvatarImage } from '../ui/avatar';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -85,27 +86,30 @@ export default function AppDrawer({ open, onClose }: { open: boolean; onClose: (
                     backgroundColor: isDark ? '#121212' : '#fff',
                 }, drawerStyle]}>
 
-                    <View className='flex-row items-center justify-between px-5 pt-14 pb-5 border-b border-zinc-100 dark:border-[#282828]'>
-                        <View className='flex-row gap-3 items-center'>
-                            <Avatar size="md">
-                                <AvatarFallbackText>{name}</AvatarFallbackText>
-                                <AvatarImage
-                                    source={{
-                                        uri: avatar || defaultAvtar,
-                                    }}
-                                />
-                            </Avatar>
+                    <Link href={'/profile'} onPress={onClose} asChild>
+                        <Pressable className='flex-row items-center justify-between px-5 pt-14 pb-5 border-b border-zinc-100 dark:border-[#282828] active:bg-zinc-50 dark:active:bg-[#1A1A1A]'>
+                            <View className='flex-row gap-3 items-center'>
+                                <Avatar size="md">
+                                    <AvatarFallbackText>{name}</AvatarFallbackText>
+                                    <AvatarImage
+                                        source={{
+                                            uri: avatar || defaultAvtar,
+                                        }}
+                                    />
+                                </Avatar>
 
-                            <View className="flex flex-col justify-center">
-                                <Text className="text-lg font-elms-med text-black dark:text-white mb-0.5">
-                                    {name}
-                                </Text>
-                                <Text className="text-sm font-elms text-gray-500 dark:text-[#B3B3B3] leading-none tracking-tight">
-                                    Arise
-                                </Text>
+                                <View className="flex flex-col justify-center">
+                                    <Text className="text-lg font-elms-med text-black dark:text-white mb-0.5">
+                                        {name}
+                                    </Text>
+                                    <Text className="text-sm font-elms text-gray-500 dark:text-[#B3B3B3] leading-none tracking-tight">
+                                        View Profile
+                                    </Text>
+                                </View>
                             </View>
-                        </View>
-                    </View>
+                            <ChevronRight size={18} color={isDark ? '#B3B3B3' : '#71717a'} />
+                        </Pressable>
+                    </Link>
 
                     <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
 
