@@ -243,7 +243,7 @@ export default function Profile() {
                             title="Watch Later"
                             subtitle="0 saved videos queued"
                             isDark={isDark}
-                            onPress={() => goToComingSoon('Watch Later')}
+                            onPress={() => router.push('/watch-later')}
                         />
                         <ProfileMenuItem
                             Icon={UserPlus}
@@ -282,7 +282,7 @@ export default function Profile() {
                             title="Activity Logs History"
                             subtitle="Review recently played tracks & visited pages"
                             isDark={isDark}
-                            onPress={() => goToComingSoon('Activity Logs History')}
+                            onPress={() => router.push('/activity-history')}
                         />
                         <ProfileMenuItem
                             Icon={SettingsIcon}
@@ -291,7 +291,7 @@ export default function Profile() {
                             subtitle="Submit star rating & help improve Arise"
                             isDark={isDark}
                             isLast
-                            onPress={() => goToComingSoon('Feedback & Rating')}
+                            onPress={() => router.push('/submit-feedback')}
                         />
                     </View>
 
