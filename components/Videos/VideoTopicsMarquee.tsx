@@ -3,17 +3,24 @@
 
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Clapperboard, Flame, LucideIcon, Music2, Tv, Zap } from 'lucide-react-native';
 import React from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 
-const TOPICS = ['🔥 Trending videos', '⚡ Viral videos', '🎬 Movies', '🎵 Music videos', '📺 Live streams'];
+const TOPICS: { label: string; Icon: LucideIcon }[] = [
+    { label: 'Trending videos', Icon: Flame },
+    { label: 'Viral videos', Icon: Zap },
+    { label: 'Movies', Icon: Clapperboard },
+    { label: 'Music videos', Icon: Music2 },
+    { label: 'Live streams', Icon: Tv },
+];
 
 // Reserve just enough space on the left for the pinned Shorts + Live badges (sized to
 // them, not a wide guess), plus a slim smoke-fade strip where scrolling pills reappear.
 const FIXED_W = 110;
 const FADE_W = 14;
 
-function Pill({ text, isDark }: { text: string; isDark: boolean }) {
+function Pill({ text, Icon, isDark }: { text: string; Icon: LucideIcon; isDark: boolean }) {
     return (
         <View
             style={{
@@ -21,9 +28,13 @@ function Pill({ text, isDark }: { text: string; isDark: boolean }) {
                 paddingHorizontal: 14,
                 paddingVertical: 6,
                 borderRadius: 999,
-                backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.06)',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(31,36,48,0.06)',
             }}
         >
+            <Icon size={13} color={isDark ? '#E8C468' : '#B8860B'} />
             <Text
                 className="text-[12px] font-elms-med text-gray-700 dark:text-white"
                 numberOfLines={1}
@@ -47,8 +58,8 @@ export default function VideoTopicsMarquee({ isDark, backgroundColor }: { isDark
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingLeft: FIXED_W, paddingRight: 4, alignItems: 'center' }}
             >
-                {TOPICS.map((t, i) => (
-                    <Pill key={i} text={t} isDark={isDark} />
+                {TOPICS.map((t) => (
+                    <Pill key={t.label} text={t.label} Icon={t.Icon} isDark={isDark} />
                 ))}
             </ScrollView>
 

@@ -3,19 +3,20 @@
 
 import { useAppSelector } from '@/hooks/useRedux';
 import { defaultAvtar } from '@/utils/constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Device from 'expo-device';
+import * as FileSystem from 'expo-file-system/legacy';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import {
     Bot,
-    Clock,
     Cloud,
-    History,
-    Lock,
-    LogIn,
-    LogOut,
-    Settings as SettingsIcon,
-    Share2,
-    Star,
+    Crown,
+    Gem,
+    HardDrive,
+    MessageCircle,
+    Settings,
+    Smartphone,
     UserPlus,
 } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
@@ -26,45 +27,85 @@ import ProfileAnimatedBackground from './ProfileAnimatedBackground';
 import ProfileMenuItem from './ProfileMenuItem';
 import ProfileStatCard from './ProfileStatCard';
 
-// Simple track+fill progress bar (no need for Reanimated here - these values only
-// change on real state updates, not every frame, so a plain style width is cheap).
-function ProgressBar({ progress, color, isDark }: { progress: number; color: string; isDark: boolean }) {
+const ROOT = FileSystem.documentDirectory ?? '';
+const DOWNLOADS_DIR = `${ROOT}ariseDownloads/`;
+const VAULT_DIR = `${ROOT}ariseVault/`;
+
+function formatBytes(bytes: number) {
+    if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(0)} KB`;
+    if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
+    return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
+}
+
+async function dirStats(dir: string) {
+    const info = await FileSystem.getInfoAsync(dir);
+    if (!info.exists) return { count: 0, bytes: 0 };
+    const names = await FileSystem.readDirectoryAsync(dir);
+    let bytes = 0;
+    for (const name of names) {
+        const item = await FileSystem.getInfoAsync(dir + name, { size: true });
+        if (item.exists && !item.isDirectory) bytes += (item as any).size ?? 0;
+    }
+    return { count: names.length, bytes };
+}
+
+function ProgressBar({ progress, color }: { progress: number; color: string }) {
     return (
-        <View
-            style={{ height: 8, borderRadius: 4, overflow: 'hidden' }}
-            className="bg-zinc-100 dark:bg-[#282828]"
-        >
+        <View style={{ height: 8, borderRadius: 4, overflow: 'hidden' }} className="bg-[#F1EAD8] dark:bg-[#282828]">
             <View style={{ width: `${Math.max(0, Math.min(100, progress * 100))}%`, height: '100%', backgroundColor: color, borderRadius: 4 }} />
         </View>
     );
 }
 
+// Every value on this screen is read from the phone or the app's own storage:
+// device disk space, the app's real downloads/vault folders, the real vault PIN
+// state and the real device model. Nothing here is a placeholder.
 export default function Profile() {
     const router = useRouter();
     const { colorScheme } = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const accent = isDark ? '#E8C468' : '#B8860B';
 
-    // Real account fields (already wired to your Redux store elsewhere in the app)
     const { name, avatar } = useAppSelector((state) => state.userReducer);
+    const displayName = name && name !== 'default' ? name : 'Arise';
 
-    // --- Everything below is demo/placeholder state, matching Cloudihub's own
-    // fallback values, until this is wired to a real backend/auth + downloads list ---
-    const isSignedIn = false;
-    const username = name && name !== 'default' ? `@${name.toLowerCase().replace(/\s+/g, '_')}` : '@alexskyward';
-    const email = 'alex.skyward@arise.app';
-    const level = 5;
-    const xp = 3450;
-    const xpTarget = 5000;
-    const badgeTitle = 'Sky Voyager';
-    const badgeColor = '#0284C7';
-    const offlineFilesCount = 0;
-    const storagePercent = 24;
-    const storageUsedGB = 2.4;
-    const storageTotalGB = 10;
-    const isVaultSetUp = false;
+    const [disk, setDisk] = React.useState<{ free: number; total: number } | null>(null);
+    const [ariseBytes, setAriseBytes] = React.useState(0);
+    const [offlineCount, setOfflineCount] = React.useState(0);
+    const [vaultReady, setVaultReady] = React.useState(false);
 
-    const goToComingSoon = (title: string) =>
-        router.push({ pathname: '/coming-soon', params: { title } });
+    useFocusEffect(
+        React.useCallback(() => {
+            let alive = true;
+            (async () => {
+                const [free, total, downloads, vault, pin] = await Promise.all([
+                    FileSystem.getFreeDiskStorageAsync(),
+                    FileSystem.getTotalDiskCapacityAsync(),
+                    dirStats(DOWNLOADS_DIR),
+                    dirStats(VAULT_DIR),
+                    AsyncStorage.getItem('arise_vault_pin_hash'),
+                ]);
+                if (!alive) return;
+                setDisk({ free, total });
+                setAriseBytes(downloads.bytes + vault.bytes);
+                setOfflineCount(downloads.count);
+                setVaultReady(!!pin);
+            })();
+            return () => {
+                alive = false;
+            };
+        }, [])
+    );
+
+    const cardShadow = {
+        shadowColor: '#B8860B',
+        shadowOpacity: isDark ? 0 : 0.1,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 5 },
+        elevation: isDark ? 0 : 3,
+    } as const;
+
+    const usedFraction = disk ? (disk.total - disk.free) / disk.total : 0;
 
     return (
         <View style={{ flex: 1 }}>
@@ -72,11 +113,11 @@ export default function Profile() {
 
             <SafeAreaView edges={['top']} style={{ flex: 1 }}>
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
-                    {/* --- HEADER: avatar + badge + name/username/email + sign-in pill --- */}
+                    {/* --- HEADER --- */}
                     <View className="items-center px-4 py-4">
-                        <Pressable onPress={() => goToComingSoon('Edit Profile')}>
+                        <Pressable onPress={() => router.push('/setting')}>
                             <LinearGradient
-                                colors={['#0284C7', '#9333EA']}
+                                colors={['#E8C468', '#B8860B']}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 1 }}
                                 style={{ width: 112, height: 112, borderRadius: 56, padding: 3 }}
@@ -89,8 +130,6 @@ export default function Profile() {
                                     />
                                 </View>
                             </LinearGradient>
-
-                            {/* Rank badge overlay */}
                             <View
                                 style={{
                                     position: 'absolute',
@@ -101,210 +140,126 @@ export default function Profile() {
                                     borderRadius: 17,
                                     backgroundColor: '#fff',
                                     borderWidth: 1.5,
-                                    borderColor: badgeColor,
+                                    borderColor: '#B8860B',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                 }}
                             >
-                                <Star size={16} color={badgeColor} fill={badgeColor} />
+                                <Crown size={16} color="#B8860B" fill="#B8860B" />
                             </View>
                         </Pressable>
 
-                        <Text className="text-[22px] font-elms-med text-black dark:text-white mt-3">
-                            {name && name !== 'default' ? name : 'Alex Skyward'}
-                        </Text>
-                        <Text className="text-[13px] text-zinc-500 dark:text-[#B3B3B3] font-elms mt-0.5">
-                            {username}
-                        </Text>
+                        <Text className="text-[22px] font-elms-med text-black dark:text-white mt-3">{displayName}</Text>
                         <Text className="text-[12px] text-zinc-400 dark:text-[#7A7A7A] font-elms mt-0.5">
-                            {email}
+                            Tap the photo to edit your profile
                         </Text>
                     </View>
 
-                    {/* --- RANK / LEVEL CARD --- */}
-                    <View className="mx-4 rounded-2xl p-4 border border-zinc-100 dark:border-[#282828] bg-white dark:bg-[#1A1A1A]">
-                        <View className="flex-row items-center justify-between">
-                            <View className="flex-row items-center gap-3 flex-1">
-                                <Image
-                                    source={{ uri: avatar || defaultAvtar }}
-                                    style={{ width: 36, height: 36, borderRadius: 18, opacity: isSignedIn ? 1 : 0.4 }}
-                                />
-                                <View className="flex-1">
-                                    <Text className="text-[15px] font-elms-med text-black dark:text-white" numberOfLines={1}>
-                                        {isSignedIn ? `Level ${level} • ${badgeTitle}` : 'Level Locked • Sign In'}
-                                    </Text>
-                                    <Text className="text-[11.5px] text-zinc-500 dark:text-[#B3B3B3] font-elms" numberOfLines={1}>
-                                        {isSignedIn ? `XP Progress: ${xp.toLocaleString()} / ${xpTarget.toLocaleString()} XP` : 'Sign in to earn XP & unlock perks'}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            <Pressable
-                                onPress={() => goToComingSoon(isSignedIn ? 'Prime Level & Badges' : 'Sign In')}
-                                className="rounded-xl px-2.5 py-1.5"
-                                style={{ backgroundColor: isSignedIn ? '#ECFDF5' : (isDark ? '#242424' : '#F1F5F9') }}
-                            >
-                                <Text
-                                    className="text-[11px] font-elms-med"
-                                    style={{ color: isSignedIn ? '#059669' : '#64748B' }}
-                                >
-                                    {isSignedIn ? 'Upgrade ⚡' : 'Sign In 🔒'}
-                                </Text>
-                            </Pressable>
-                        </View>
-
-                        <View className="mt-3.5">
-                            <ProgressBar progress={isSignedIn ? xp / xpTarget : 0} color={isSignedIn ? badgeColor : '#94A3B8'} isDark={isDark} />
-                        </View>
-
-                        <View className="flex-row items-center justify-between mt-2.5">
-                            <Text className="text-[11px] text-zinc-500 dark:text-[#B3B3B3] font-elms-med">
-                                {isSignedIn ? 'Next Tier: Level 6 • Diamond Elite' : 'Unlock ranks by signing in'}
-                            </Text>
-                            <Text
-                                className="text-[11px] font-elms-med"
-                                style={{ color: isSignedIn ? badgeColor : '#64748B' }}
-                            >
-                                {isSignedIn ? `${Math.round((xp / xpTarget) * 100)}%` : '0%'}
-                            </Text>
-                        </View>
-                    </View>
-
-                    {/* --- STORAGE QUOTA CARD --- */}
-                    <View className="mx-4 mt-4 rounded-2xl p-4 border border-zinc-100 dark:border-[#282828] bg-white dark:bg-[#1A1A1A]">
+                    {/* --- DEVICE STORAGE (live from the OS) --- */}
+                    <View
+                        className="mx-4 rounded-2xl p-4 border border-[#ECE3CE] dark:border-[#282828] bg-[#FFFFFF] dark:bg-[#1A1A1A]"
+                        style={cardShadow}
+                    >
                         <View className="flex-row items-center justify-between">
                             <View className="flex-row items-center gap-2">
-                                <Cloud size={20} color={isDark ? '#38BDF8' : '#0284C7'} />
-                                <Text className="text-[14px] font-elms-med text-black dark:text-white">Arise Storage</Text>
+                                <HardDrive size={20} color={accent} />
+                                <Text className="text-[14px] font-elms-med text-black dark:text-white">Device Storage</Text>
                             </View>
-                            <View className="rounded-lg px-2 py-1" style={{ backgroundColor: isDark ? '#0C2A3D' : '#F0F9FF' }}>
-                                <Text className="text-[11px] font-elms-med" style={{ color: isDark ? '#38BDF8' : '#0284C7' }}>
-                                    {storagePercent}% Used
-                                </Text>
-                            </View>
+                            {disk && (
+                                <View className="rounded-lg px-2 py-1" style={{ backgroundColor: accent + '1F' }}>
+                                    <Text className="text-[11px] font-elms-med" style={{ color: accent }}>
+                                        {Math.round(usedFraction * 100)}% used
+                                    </Text>
+                                </View>
+                            )}
                         </View>
                         <View className="mt-3">
-                            <ProgressBar progress={storagePercent / 100} color={isDark ? '#38BDF8' : '#0284C7'} isDark={isDark} />
+                            <ProgressBar progress={usedFraction} color={accent} />
                         </View>
                         <View className="flex-row items-center justify-between mt-2">
                             <Text className="text-[12px] text-zinc-500 dark:text-[#B3B3B3] font-elms-med">
-                                {storageUsedGB} GB Used
+                                {disk ? `${formatBytes(disk.total - disk.free)} used` : 'Reading storage...'}
                             </Text>
                             <Text className="text-[12px] text-zinc-400 dark:text-[#7A7A7A] font-elms">
-                                {storageTotalGB} GB Total
+                                {disk ? `${formatBytes(disk.free)} free of ${formatBytes(disk.total)}` : ''}
                             </Text>
                         </View>
+                        <Text className="text-[11.5px] text-zinc-500 dark:text-[#B3B3B3] font-elms mt-2">
+                            Arise is using {formatBytes(ariseBytes)} (downloads + vault)
+                        </Text>
                     </View>
 
                     {/* --- STATS ROW --- */}
                     <View className="flex-row gap-3 px-4 mt-4">
                         <ProfileStatCard
                             title="Offline Files"
-                            value={`${offlineFilesCount} files`}
+                            value={`${offlineCount} ${offlineCount === 1 ? 'item' : 'items'}`}
                             Icon={Cloud}
                             isDark={isDark}
-                            onPress={() => goToComingSoon('Offline Folders')}
+                            onPress={() => router.push('/offline-folders')}
                         />
                         <ProfileStatCard
-                            title="Linked Devices"
-                            value="3 Active"
-                            Icon={Share2}
+                            title="This Device"
+                            value={Device.modelName ?? 'View info'}
+                            Icon={Smartphone}
                             isDark={isDark}
-                            onPress={() => goToComingSoon('Linked Devices')}
+                            onPress={() => router.push('/this-device')}
                         />
                         <ProfileStatCard
                             title="Private Vault"
-                            value={isVaultSetUp ? 'Protected' : 'Locked'}
-                            Icon={Lock}
+                            value={vaultReady ? 'Protected' : 'Not set up'}
+                            Icon={Gem}
                             isDark={isDark}
-                            onPress={() => goToComingSoon('Private Vault')}
+                            onPress={() => router.push('/private-vault')}
                         />
                     </View>
 
-                    {/* --- ACCOUNT CARD --- */}
-                    <View className="mx-4 mt-5 rounded-2xl border border-zinc-100 dark:border-[#282828] bg-white dark:bg-[#1A1A1A] overflow-hidden">
+                    {/* --- ACCOUNT --- */}
+                    <View
+                        className="mx-4 mt-5 rounded-2xl border border-[#ECE3CE] dark:border-[#282828] bg-[#FFFFFF] dark:bg-[#1A1A1A] overflow-hidden"
+                        style={cardShadow}
+                    >
                         <ProfileMenuItem
-                            Icon={isSignedIn ? Star : Lock}
-                            iconColor={isSignedIn ? '#D97706' : '#64748B'}
-                            title="Prime Level & Badges Shop"
-                            subtitle={isSignedIn ? `Active: Level ${level} • Upgrade badges & unlock perks` : '🔒 Locked • Sign in to view level, balance & badges'}
+                            Icon={Settings}
+                            title="Account & Settings"
+                            subtitle="Edit your name, photo and app preferences"
                             isDark={isDark}
-                            onPress={() => goToComingSoon('Prime Level & Badges')}
+                            onPress={() => router.push('/setting')}
                         />
                         <ProfileMenuItem
                             Icon={Bot}
-                            title="AI Copilot & Permissions"
-                            subtitle="Disabled • Tap to configure permissions"
+                            title="App Permissions"
+                            subtitle="See and change what Arise can access"
                             isDark={isDark}
-                            onPress={() => goToComingSoon('AI Copilot & Permissions')}
-                        />
-                        <ProfileMenuItem
-                            Icon={Clock}
-                            title="Watch Later"
-                            subtitle="0 saved videos queued"
-                            isDark={isDark}
-                            onPress={() => router.push('/watch-later')}
+                            onPress={() => router.push('/ai-permissions')}
                         />
                         <ProfileMenuItem
                             Icon={UserPlus}
                             title="Invite Friend"
-                            subtitle="Invite friends & earn free storage"
-                            isDark={isDark}
-                            onPress={() => goToComingSoon('Invite Friend')}
-                        />
-                        <ProfileMenuItem
-                            Icon={Cloud}
-                            iconColor="#0284C7"
-                            title="Downloads"
-                            subtitle="Manage downloaded videos, music, files & folders"
+                            subtitle="Share your invite code and link"
                             isDark={isDark}
                             isLast
-                            onPress={() => router.push('/(tabs)/downloader-hub')}
+                            onPress={() => router.push('/invite-friend')}
                         />
                     </View>
 
-                    {/* --- SYSTEM PREFERENCES --- */}
+                    {/* --- SUPPORT --- */}
                     <Text className="text-[10px] font-elms-med text-zinc-400 dark:text-[#7A7A7A] tracking-widest px-6 pt-5 pb-1.5">
-                        SYSTEM PREFERENCES
+                        SUPPORT
                     </Text>
-                    <View className="mx-4 rounded-2xl border border-zinc-100 dark:border-[#282828] bg-white dark:bg-[#1A1A1A] overflow-hidden">
+                    <View
+                        className="mx-4 rounded-2xl border border-[#ECE3CE] dark:border-[#282828] bg-[#FFFFFF] dark:bg-[#1A1A1A] overflow-hidden"
+                        style={cardShadow}
+                    >
                         <ProfileMenuItem
-                            Icon={Share2}
-                            iconColor="#6366F1"
-                            title="Cloud Services Hub"
-                            subtitle="Manage your active external cloud portals"
-                            isDark={isDark}
-                            onPress={() => goToComingSoon('Cloud Services Hub')}
-                        />
-                        <ProfileMenuItem
-                            Icon={History}
-                            iconColor="#0284C7"
-                            title="Activity Logs History"
-                            subtitle="Review recently played tracks & visited pages"
-                            isDark={isDark}
-                            onPress={() => router.push('/activity-history')}
-                        />
-                        <ProfileMenuItem
-                            Icon={SettingsIcon}
-                            iconColor="#EC4899"
-                            title="Feedback & Rating"
-                            subtitle="Submit star rating & help improve Arise"
+                            Icon={MessageCircle}
+                            title="Send Feedback"
+                            subtitle="Rate Arise and tell us what to improve"
                             isDark={isDark}
                             isLast
                             onPress={() => router.push('/submit-feedback')}
                         />
                     </View>
-
-                    {/* --- LOGOUT / LOGIN --- */}
-                    <Pressable
-                        onPress={() => goToComingSoon(isSignedIn ? 'Logout' : 'Log In / Sign Up')}
-                        className="flex-row items-center justify-center gap-2 mx-4 mt-6 py-3.5"
-                    >
-                        {isSignedIn ? <LogOut size={20} color="#EF4444" /> : <LogIn size={20} color="#EF4444" />}
-                        <Text className="text-[16px] font-elms-med" style={{ color: '#EF4444' }}>
-                            {isSignedIn ? 'Logout' : 'Log In / Sign Up'}
-                        </Text>
-                    </Pressable>
                 </ScrollView>
             </SafeAreaView>
         </View>

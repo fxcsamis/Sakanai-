@@ -91,7 +91,7 @@ export default function SuggestGrids({ onLiked, onRecent, onSuggested, onTopPick
         },
         {
             label: 'Top Pick',
-            tag: '🔥 Trending',
+            tag: 'Trending',
             color: ['#be185d', '#e11d48'] as const,
             uri: 'https://res.cloudinary.com/dcyn3ewpv/image/upload/v1780851856/g4_n0i8ew.jpg',
             callback: onTopPick

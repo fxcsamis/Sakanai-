@@ -49,7 +49,7 @@ export default function ProfileAnimatedBackground({ isDark }: { isDark: boolean 
         transform: [{ translateY: 260 + (t3.value * 14 - 7) }],
     }));
 
-    const cloudTint = isDark ? '#38BDF8' : '#0284C7';
+    const cloudTint = isDark ? '#E8C468' : '#B8860B';
 
     return (
         <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} pointerEvents="none">
@@ -60,7 +60,7 @@ export default function ProfileAnimatedBackground({ isDark }: { isDark: boolean 
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+                    backgroundColor: isDark ? '#0F172A' : '#FAF8F3',
                 }}
             />
             <Animated.View style={[{ position: 'absolute', left: 0, top: 0, opacity: 0.14 }, cloud1Style]}>

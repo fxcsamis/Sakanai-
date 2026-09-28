@@ -23,9 +23,9 @@ export default function ProfileStatCard({
             onPress={onPress}
             disabled={!onPress}
             style={{ flex: 1 }}
-            className="rounded-2xl p-3 border border-zinc-100 dark:border-[#282828] bg-white dark:bg-[#1A1A1A]"
+            className="rounded-2xl p-3 border border-[#ECE3CE] dark:border-[#282828] bg-[#FFFFFF] dark:bg-[#1A1A1A]"
         >
-            <Icon size={18} color={isDark ? '#38BDF8' : '#0284C7'} />
+            <Icon size={18} color={isDark ? '#E8C468' : '#B8860B'} />
             <Text className="text-[11px] text-zinc-500 dark:text-[#B3B3B3] font-elms-med mt-2" numberOfLines={1}>
                 {title}
             </Text>

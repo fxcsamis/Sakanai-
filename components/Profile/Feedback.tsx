@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { ArrowLeft, Star } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import React from 'react';
-import { Pressable, Text, TextInput, ToastAndroid, View } from 'react-native';
+import { Pressable, Share, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Feedback() {
@@ -17,16 +17,18 @@ export default function Feedback() {
     const [liked, setLiked] = React.useState('');
     const [improve, setImprove] = React.useState('');
 
-    const submit = () => {
-        ToastAndroid.show(`Thank you! Your ${rating}-star feedback submitted successfully.`, ToastAndroid.LONG);
-        router.back();
+    // Sends the feedback through whichever app the user picks (mail, Telegram, ...).
+    // Nothing is claimed as "submitted" - only the share sheet actually opening.
+    const submit = async () => {
+        const message = `Arise feedback - ${rating}/5 stars\n\nLiked: ${liked || '-'}\nImprove: ${improve || '-'}`;
+        await Share.share({ message });
     };
 
-    const inputBorder = isDark ? '#282828' : '#E2E8F0';
+    const inputBorder = isDark ? '#282828' : '#ECE3CE';
     const inputText = isDark ? '#FFFFFF' : '#0F172A';
 
     return (
-        <View style={{ flex: 1, backgroundColor: isDark ? '#121212' : '#FFFFFF' }}>
+        <View style={{ flex: 1, backgroundColor: isDark ? '#121212' : '#FAF8F3' }}>
             <SafeAreaView edges={['top']} style={{ flex: 1 }}>
                 <View className="flex-row items-center px-5 pt-2 pb-1">
                     <Pressable onPress={() => router.back()} hitSlop={10} className="w-9 h-9 items-center justify-center -ml-2">
@@ -78,10 +80,10 @@ export default function Feedback() {
 
                     <Pressable
                         onPress={submit}
-                        style={{ backgroundColor: '#0284C7' }}
+                        style={{ backgroundColor: '#B8860B' }}
                         className="w-full rounded-xl h-12 items-center justify-center mt-6"
                     >
-                        <Text className="text-white font-elms-med text-[14px]">Submit Review</Text>
+                        <Text className="text-white font-elms-med text-[14px]">Send Feedback</Text>
                     </Pressable>
                 </View>
             </SafeAreaView>

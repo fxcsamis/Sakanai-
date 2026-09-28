@@ -89,9 +89,11 @@ export default function TermAndConditionSheet({ open, onClose }: { open: boolean
                 ))}
 
                 <View className='mt-2 items-center py-4 border-t border-zinc-100 dark:border-[#282828]'>
-                    <Text className='text-xs font-elms text-zinc-400 dark:text-[#535353] text-center'>
-                        Built with ♥ by Raj · Arise v1.0
-                    </Text>
+                    <View className='flex-row items-center justify-center gap-1'>
+                        <Text className='text-xs font-elms text-zinc-400 dark:text-[#535353]'>Built with</Text>
+                        <Heart size={11} color='#B8860B' fill='#B8860B' />
+                        <Text className='text-xs font-elms text-zinc-400 dark:text-[#535353]'>by Raj - Arise v1.0</Text>
+                    </View>
                 </View>
             </ScrollView>
         </SheetProvider>

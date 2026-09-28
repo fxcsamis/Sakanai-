@@ -61,6 +61,13 @@ export default function Layout() {
                             <Stack.Screen name='video-search' options={{ animation: 'slide_from_right' }} />
                             <Stack.Screen name='music-search' options={{ animation: 'fade', animationDuration: 150 }} />
                             <Stack.Screen name='music-setting' options={{ animation: 'slide_from_right' }} />
+                            <Stack.Screen name='profile' options={{ animation: 'slide_from_right' }} />
+                            <Stack.Screen name='submit-feedback' options={{ animation: 'slide_from_right' }} />
+                            <Stack.Screen name='ai-permissions' options={{ animation: 'slide_from_right' }} />
+                            <Stack.Screen name='this-device' options={{ animation: 'slide_from_right' }} />
+                            <Stack.Screen name='invite-friend' options={{ animation: 'slide_from_right' }} />
+                            <Stack.Screen name='offline-folders' options={{ animation: 'slide_from_right' }} />
+                            <Stack.Screen name='private-vault' options={{ animation: 'slide_from_right' }} />
                           </Stack>
                           <VideoPlayerOverlay />
                         </GluestackUIProvider>
